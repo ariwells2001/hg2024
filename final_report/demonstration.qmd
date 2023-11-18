@@ -1,0 +1,79 @@
+---
+title: "Demonstration"
+---
+
+## 데모 구성
+
+API Server (Django), Front-end App with ML
+
+### MariaDB 설치(Mac기준)
+
+```{bash}
+# Mariadb installation
+brew install mariadb
+brew services restart mariadb
+
+#restart MAC
+
+# password 없이 mysql에 로그인
+sudo mysql -u root
+
+#mysql 로그인 후:
+use mysql;
+alter user 'root'@'localhost' identified by 'password'
+```
+
+### Database에 csv file import 하기
+
+#### Django 서버에서 생성한 테이블에 적합하도록 csv file 변경하기
+
+```{python}
+
+import pandas as pd
+
+df = pd.read_csv("integrated_0526_0622.csv")
+df.head()
+
+```
+
+기존 데이터프레임 수정
+
+```{python}
+df.reset_index(inplace=True)
+df['account'] ="ariwells2001@gmail.com"
+df['id'] = df.iloc[:,0] + 1
+df['timestamp'] = df['timestamp'].str[:-6]
+df['user_id'] = 1
+df = df.loc[:,['id','account','timestamp','co2','temperature','humidity','door','motion','fp2','occupancy','user_id']]
+df.head(2)
+```
+
+```{python}
+df.to_csv("iot.csv",index=False)
+df.head(2)
+```
+
+#### 수정된 csv file Mariadb(mysql)에 import하기
+
+```{bash}
+#mysql에 로그인
+
+#iotuser라는 ID 생성하기
+create user 'iotuser'@'localhost' identified by 'iot12345';
+create user 'iotuser'@'%' identified by 'iot12345';
+grant all privileges on *.* to 'iotuser'@'localhost';
+grant all privileges on *.* to 'iotuser'@'%';
+flush privileges;
+
+#Django에서 생성된 테이블(patternTablee)의 user라는 foreign_key를 import시 체크하지 않도록 설정
+set foreign_key_checks=0
+load data infile "iot.csv" into table patternTable fields terminated by ',' ignore 1 rows;
+set foreign_key_checks=1  # revert to the original setting
+
+```
+
+#### Django와 MariaDB 연동 테스트
+
+```{python}
+
+```

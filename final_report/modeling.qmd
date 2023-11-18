@@ -1,0 +1,188 @@
+---
+title: "Modeling"
+---
+
+```{r include=F}
+knitr::opts_chunk$set(warning=F,message=F)
+
+library(data.table)
+library(tidyverse)
+library(tidymodels)
+library(rsample)
+library(xgboost)
+library(caret)
+```
+
+## Data Loading
+
+```{r}
+train <- read.csv("train.csv")
+test <- read.csv("test.csv")
+
+train <- train %>% 
+  select(-X,-weekday) %>% 
+  mutate_if(is.character,as.factor)
+
+test <- test %>% 
+  select(-X,-weekday) %>% 
+  mutate_if(is.character,as.factor)
+```
+
+```{r}
+rec <- train %>% 
+  recipe(occupancy ~.) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_dummy(all_factor_predictors())
+
+```
+
+## Baseline Modeling
+
+### Logistic Regression
+
+```{r}
+lr_mod <- 
+  logistic_reg() %>% 
+  set_engine('glm')
+
+aqara_workflow <- 
+  workflow() %>% 
+  add_model(lr_mod) %>% 
+  add_recipe(rec)
+
+aqara_workflow
+```
+
+```{r}
+lr_gridsearch <- aqara_workflow %>%
+  fit(data = train)
+```
+
+```{r}
+lr_gridsearch %>% 
+  pull_workflow_fit() %>% 
+  tidy()
+```
+
+```{r}
+pred <- predict(lr_gridsearch,test) 
+pred <- pred$.pred_class
+confusionMatrix(pred,test$occupancy)
+```
+
+```{r}
+pred_prob <- predict(lr_gridsearch,test,type='prob') %>% 
+  bind_cols(test %>% select(occupancy))
+pred_prob 
+
+```
+
+```{r}
+pred_prob %>% 
+  roc_curve(truth=occupancy,.pred_detection) %>% 
+  autoplot()
+```
+
+```{r}
+pred_prob %>% 
+  roc_auc(truth = occupancy, .pred_detection)
+```
+
+### Random Forest
+
+```{r}
+control <- trainControl(method='cv',
+                        number=5,
+                        classProbs=T,
+                        summaryFunction = twoClassSummary,
+                        savePredictions="all")
+
+tunegrid <- expand.grid(mtry = c(1:5))
+
+rf_gridsearch <- train(rec,train,
+                       method='rf',
+                       trControl = control,
+                       tuneGrid = tunegrid,
+                       metric ="ROC")
+```
+
+```{r}
+pred <- predict(rf_gridsearch,newdata=test)
+confusionMatrix(pred,test$occupancy)
+
+```
+
+### Xgboost
+
+```{r}
+control <- trainControl(method='cv',
+                        number=5,
+                        classProbs=T,
+                        summaryFunction = twoClassSummary,
+                        savePredictions="all")
+
+
+xgb_gridsearch <- train(rec,train,
+                       method='xgbTree',
+                       trControl = control,
+                       tuneLength = 3,
+                       metric ="ROC",
+                       verbosity = 0)
+```
+
+```{r}
+pred_xgb <- predict(xgb_gridsearch,newdata=test)
+confusionMatrix(pred_xgb,test$occupancy)
+```
+
+### Support Vector Machine
+
+```{r}
+
+svm_gridsearch <- train(rec,train,
+                        method = "svmPoly",
+                        trControl = control,
+                        tuneLength = 2,
+                        metric="ROC")
+```
+
+```{r}
+pred_svm <- predict(svm_gridsearch,newdata=test)
+confusionMatrix(pred_svm,test$occupancy)
+```
+
+### Ridge Regression
+
+```{r}
+
+lambda <- seq(0,1,length=11)
+ridge_grid <- expand.grid(alpha=0,lambda=lambda)
+ridge_gridsearch <- train(rec,train,
+                       method="glmnet",
+                       trControl = control,
+                       tuneGrid = ridge_grid,
+                       metric = "ROC")
+```
+
+```{r}
+pred_ridge <- predict(ridge_gridsearch,newdata=test)
+confusionMatrix(pred_ridge,test$occupancy)
+```
+
+### Model Selection Based on Cross-Validation
+
+```{r}
+resamps <- resamples(list(
+                          random_forest = rf_gridsearch,
+                          xgb = xgb_gridsearch,
+                          svm = svm_gridsearch,
+                          ridge = ridge_gridsearch
+                          ))
+summary(resamps)
+```
+
+```{r}
+bwplot(resamps,metric="ROC")
+```
+
+Argument: ROC를 기반으로 판단해 보면, randomForest와 XGB가 가장 우수하나, randomForest가 상대적으로 분산이 작고, 성능도 약간 우수한 편이므로 randomForest를 최종 모델로 선택한 것이 바람직 하다.

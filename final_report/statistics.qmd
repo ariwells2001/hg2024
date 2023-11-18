@@ -1,0 +1,139 @@
+---
+title: "Statistics"
+---
+
+## 통계 검정
+
+```{r include=F}
+knitr::opts_chunk$set(warning=F,message=F)
+library(tidyverse)
+
+```
+
+```{r}
+st_aqara <- read.csv("eda.csv")
+st_aqara %>% glimpse()
+
+```
+
+```{r}
+st_aqara <- st_aqara %>% 
+  mutate(timestamp = as.POSIXct(timestamp)) %>% 
+  mutate_if(is.character, as.factor)
+st_aqara %>% 
+  str()
+```
+
+### Occupancy 유무에 따라 CO2 평균값에 차이가 있는지 검정
+
+```         
+Null Hypothesis: occupancy 유무에 따른 CO2평균값의 차이는 없다.
+
+Alternative Hypothesis: occupancy 유무에 따른 CO2평균값의 차이가 있다.
+```
+
+```{r}
+result <- t.test(co2 ~ occupancy,data=st_aqara)
+result
+
+```
+
+```{r}
+co2_occupancy <- lm(co2 ~ occupancy,data=st_aqara)
+plot(co2_occupancy)
+```
+
+```{r}
+# residual normality test
+shapiro.test(resid(co2_occupancy))
+co2_detection <- st_aqara %>% 
+  filter(occupancy=="detection") %>% 
+  select(co2)
+co2_non_detection <- st_aqara %>% 
+  filter(occupancy=="non_detection") %>% 
+  select(co2)
+# when detected, normality test
+shapiro.test(co2_detection$co2)
+# when not detected, normality test
+shapiro.test(co2_non_detection$co2)
+
+```
+
+위의 Shapiro-Wilk 정규성 결과에 따라 정규성을 따르고 있지 않으므로 비모수 검정 시행(Wilcox 순위합 검정)
+
+```{r}
+result <- wilcox.test(co2 ~ occupancy,alternative="two.sided",data=st_aqara)
+result
+```
+
+Wilcoxon rank sum test결과 유의확률이 유의수준(0.05)보다 작으므로, 귀무가설을 기각한다. 즉, occupancy유무에 따라 co2의 평균값에 유의한 차이를 보인다.
+
+### Occupancy 유무에 따라 Temperature 평균값에 차이가 있는지 검정
+
+Null Hypothesis: occupancy 유무에 따른 Temperature평균값의 차이는 없다.
+
+Alternative Hypothesis: occupancy 유무에 따른 Temperature평균값의 차이가 있다.
+
+```{r}
+# Normality Test
+with(st_aqara,shapiro.test(temperature))
+```
+
+위의 Shapiro-Wilk 정규성 검정 결과, 정규성을 따르지 않으므로 Wilcox 순위합 검정을 시행한다.
+
+```{r}
+result <- wilcox.test(temperature ~ occupancy,alternative="two.sided",data=st_aqara)
+result
+```
+
+Wilcoxon rank sum test결과 유의확률이 유의수준(0.05)보다 작으므로, 귀무가설을 기각한다. 즉, occupancy유무에 따라 temperature의 평균값에 유의한 차이를 보인다.
+
+### Occupancy 유무에 따라 Humidity 평균값에 차이가 있는지 검정
+
+Null Hypothesis: occupancy 유무에 따른 Humidity 평균값의 차이는 없다.
+
+Alternative Hypothesis: occupancy 유무에 따른 CO2평균값의 차이가 있다.
+
+```{r}
+# Normality Test
+with(st_aqara,shapiro.test(humidity))
+```
+
+위의 Shapiro-Wilk 정규성 검정 결과, 정규성을 따르지 않으므로 Wilcox 순위합 검정을 시행한다.
+
+```{r}
+result <- wilcox.test(humidity ~ occupancy,alternative="two.sided",data=st_aqara)
+result
+```
+
+Wilcoxon rank sum test결과 유의확률이 유의수준(0.05)보다 작으므로, 귀무가설을 기각한다. 즉, occupancy유무에 따라 humidity의 평균값에 유의한 차이를 보인다.
+
+### fp2와 occupancy 의 독립성 검정
+
+Null Hypothesis: fp2와 occupancy는 독립이다. (두 변수사이에는 아무런 관련이 없다.)
+
+Alternative Hypothesis: fp2와 occupancy는 독립이 아니다. (두변수 사이에는 관련이 있다.)
+
+#### Contingency Table
+
+```{r}
+ct <- with(st_aqara,table(fp2,occupancy))
+ct
+```
+
+#### Chi-square 독립성 검정
+
+```{r}
+result <- chisq.test(ct)
+result
+```
+
+Chi-square 독립성 검정 결과에 따라 p-value값이 유의수준(0.05)보다 작으므로, 귀무가설을 기각할 수 있다. 즉, fp2와 occupancy와 상호 관련이 있다.
+
+#### Chi-square검정의 신뢰성
+
+```{r}
+result$expected
+```
+
+위 각 셀의 기대값이 모두 5보다 크므로 Chi-square검정은 신뢰할 수 있으므로 위 검정을 받아 드린다.

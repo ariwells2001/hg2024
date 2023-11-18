@@ -1,0 +1,53 @@
+---
+title: "Feature_Engineering"
+---
+
+```{r include=F}
+
+knitr::opts_chunk$set(warning = F,message = F)
+
+library(data.table)
+library(tidyverse)
+library(tidymodels)
+library(rsample)
+
+
+```
+
+## EDA 후 저장된 데이터 로드
+
+```{r}
+
+dat <- read.csv("eda.csv")
+dat %>% str()
+
+dat <- dat %>% 
+  select(-X) %>% 
+  mutate(timestamp= as.POSIXct(timestamp)) %>% 
+  mutate_if(is.character, as.factor)
+
+dat %>% str()
+
+```
+
+## Train/Test 셋 분리
+
+```{r}
+dat <- dat %>% 
+  select(-c(timestamp,year,month,day,minute))
+splits <- dat %>% nrow()*0.8
+train <- dat[1:splits,]
+test <- dat[(splits+1):(dat %>% nrow()),]
+train %>% nrow()
+test %>% nrow()
+```
+
+```{r}
+dat%>% is.na() %>% colSums()
+
+```
+
+```{r}
+write.csv(train,"train.csv")
+write.csv(test,"test.csv")
+```

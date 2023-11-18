@@ -1,0 +1,143 @@
+---
+title: "Exploratory Data Analysis"
+---
+
+## Raw Data in a Glance
+
+```{r include=F}
+knitr::opts_chunk$set(warning=F,message=F)
+
+library(tidyverse)
+library(tidymodels)
+library(rsample)
+library(caret)
+library(GGally)
+library(janitor)
+library(data.table)
+library(DataExplorer)
+library(skimr)
+```
+
+### 데이터 로딩
+
+```{r}
+aqara <- fread("integrated_0526_0622.csv")
+aqara <- aqara %>% 
+  mutate(fp2 = factor(fp2,labels=c("non_detection","detection")),
+         occupancy = factor(occupancy,labels=c("non_detection","detection")),
+         timestamp = timestamp - 15*3600)
+```
+
+### Skimming Data
+
+```{r}
+aqara %>% str()
+aqara %>% skim()
+```
+
+### 날짜/시간 관련 파생변수 생성
+
+```{r}
+aqara <- aqara %>% 
+  mutate(year = year(timestamp),
+         month = month(timestamp),
+         day = day(timestamp),
+         weekday = weekdays(timestamp),
+         hour = hour(timestamp),
+         minute = minute(timestamp),
+         temperature = temperature/100,
+         humidity = humidity/100) 
+aqara %>% 
+  head()
+```
+
+## Plot Analysis
+
+### 박스플롯
+
+```{r}
+aqara %>% 
+  select_if(is.numeric) %>%
+  gather() %>% 
+  ggplot(mapping=aes(x=value,fill=key)) +
+  facet_wrap(~key,scale='free')+
+  geom_boxplot() +
+  theme_minimal() +
+  theme(legend.position='none')
+```
+
+### 히스토그램
+
+```{r}
+aqara %>% 
+  select_if(is.numeric) %>% 
+  pivot_longer(cols=everything()) %>% 
+  ggplot(mapping=aes(x=value,fill=name)) +
+  geom_histogram() +
+  facet_wrap(~name,scale='free') +
+  theme_minimal() +
+  theme(legend.position='none')
+```
+
+### Occupancy유무에 따른 수치형 변수 박스플롯
+
+```{r}
+plot_boxplot(aqara,by = "occupancy",ncol=3)
+```
+
+### fp2 감지 유무에 따른 수치형 변수 박스플롯
+
+```{r}
+plot_boxplot(aqara,by = "fp2",ncol=3)
+```
+
+### Occupancy 유무에 따른 범주형 변수 박스플롯
+
+```{r}
+plot_bar(data=aqara %>% select(-timestamp),by="occupancy",ncol=2)
+```
+
+```{r}
+aqara <- aqara %>% 
+  filter(!weekday=='Sunday') 
+```
+
+### 요일별 수치형 변수 박스플롯 - 현재는 충분한 데이터가 없으므로 의미 없음
+
+```{r}
+plot_boxplot(aqara,by = "weekday",ncol=3)
+```
+
+### Occupancy 유무에 따른 pairs플롯 및 기타
+
+```{r}
+aqara %>% 
+  ggpairs(aes(fill=occupancy))
+
+```
+
+```{r}
+aqara %>% 
+  ggplot(aes(x=occupancy,y=co2)) +
+  geom_boxplot()
+```
+
+```{r}
+aqara %>% 
+  group_by(occupancy) %>% 
+  summarise(min = min(co2),
+            mean = mean(co2),
+            max = max(co2))
+```
+
+```{r}
+aqara %>% 
+  ggplot(aes(x=weekday,y=co2),col=weekday) +
+  geom_boxplot()
+```
+
+## EDA 데이터 저장
+
+```{r}
+write.csv(aqara,"eda.csv")
+```

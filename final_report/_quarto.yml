@@ -1,0 +1,27 @@
+project:
+  type: book
+
+book:
+  title: "재실감지 프로젝트 보고서"
+  author: "Sanghyun Lee"
+  date: "11/4/2023"
+  chapters:
+    - index.qmd
+    - eda.qmd
+    - statistics.qmd
+    - feature_engineering.qmd
+    - modeling.qmd
+    - evaluation.qmd
+    - report.qmd
+    - demonstration.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+editor: visual
+

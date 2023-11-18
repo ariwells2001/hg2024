@@ -1,0 +1,92 @@
+---
+title: "Evaluation"
+---
+
+```{r include=F}
+knitr::opts_chunk$set(warning=F,message=F)
+
+library(data.table)
+library(tidyverse)
+library(tidymodels)
+library(rsample)
+library(xgboost)
+library(caret)
+```
+
+## Evaluation - randomForest 모델
+
+Cross Validation 기반하에 채택된 randomForest 모델을 평가해 본다.
+
+## Data Loading
+
+```{r}
+train <- read.csv("train.csv")
+test <- read.csv("test.csv")
+
+train <- train %>% 
+  select(-X,-weekday) %>% 
+  mutate_if(is.character,as.factor)
+
+test <- test %>% 
+  select(-X,-weekday) %>% 
+  mutate_if(is.character,as.factor)
+```
+
+```{r}
+rec <- train %>% 
+  recipe(occupancy ~.) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_dummy(all_factor_predictors())
+```
+
+## Modeling
+
+### Random Forest
+
+```{r}
+control <- trainControl(method='cv',
+                        number=5,
+                        classProbs=T,
+                        summaryFunction = twoClassSummary,
+                        savePredictions="all")
+
+tunegrid <- expand.grid(mtry = c(1:5))
+
+rf_gridsearch <- train(rec,train,
+                       method='rf',
+                       trControl = control,
+                       tuneGrid = tunegrid,
+                       metric ="ROC")
+```
+
+### Confusion Matrix
+
+```{r}
+pred <- predict(rf_gridsearch,newdata=test)
+confusionMatrix(pred,test$occupancy)
+```
+
+### Feature Importance
+
+```{r}
+plot(varImp(rf_gridsearch,scale=F))
+```
+
+### ROC
+
+```{r}
+library(pROC)
+pred_prob <- predict(rf_gridsearch,newdata=test,type="prob")[,1]
+roc_result <- roc(response=test$occupancy,
+                  predictor=pred_prob,
+                  levels =rev(levels(test$occupancy)))
+
+```
+
+```{r}
+par(pty="s")
+plot(roc_result,
+     print.thres ="best",
+     print.auc = TRUE,
+     legacy.axes = T)
+```
