@@ -193,10 +193,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#데모-구성" id="toc-데모-구성" class="nav-link active" data-scroll-target="#데모-구성"><span class="header-section-number">7.1</span> 데모 구성</a>
+  <li><a href="#데모-구성" id="toc-데모-구성" class="nav-link active" data-scroll-target="#데모-구성"><span class="header-section-number">7.1</span> 데모 구성</a></li>
+  <li><a href="#backend-api-server" id="toc-backend-api-server" class="nav-link" data-scroll-target="#backend-api-server"><span class="header-section-number">7.2</span> Backend API Server</a>
   <ul class="collapse">
-  <li><a href="#mariadb-설치mac기준" id="toc-mariadb-설치mac기준" class="nav-link" data-scroll-target="#mariadb-설치mac기준"><span class="header-section-number">7.1.1</span> MariaDB 설치(Mac기준)</a></li>
-  <li><a href="#database에-csv-file-import-하기" id="toc-database에-csv-file-import-하기" class="nav-link" data-scroll-target="#database에-csv-file-import-하기"><span class="header-section-number">7.1.2</span> Database에 csv file import 하기</a></li>
+  <li><a href="#mariadb-설치mac기준" id="toc-mariadb-설치mac기준" class="nav-link" data-scroll-target="#mariadb-설치mac기준"><span class="header-section-number">7.2.1</span> MariaDB 설치(Mac기준)</a></li>
+  <li><a href="#djangomodels.py에-정의된-patterntable" id="toc-djangomodels.py에-정의된-patterntable" class="nav-link" data-scroll-target="#djangomodels.py에-정의된-patterntable"><span class="header-section-number">7.2.2</span> Django(models.py)에 정의된 patternTable</a></li>
+  <li><a href="#database에-csv-file-import-하기" id="toc-database에-csv-file-import-하기" class="nav-link" data-scroll-target="#database에-csv-file-import-하기"><span class="header-section-number">7.2.3</span> Database에 csv file import 하기</a></li>
+  <li><a href="#수정된-csv-file-mariadbmysql에-import하기" id="toc-수정된-csv-file-mariadbmysql에-import하기" class="nav-link" data-scroll-target="#수정된-csv-file-mariadbmysql에-import하기"><span class="header-section-number">7.2.4</span> 수정된 csv file Mariadb(mysql)에 import하기</a></li>
+  <li><a href="#django와-mariadb-연동-테스트" id="toc-django와-mariadb-연동-테스트" class="nav-link" data-scroll-target="#django와-mariadb-연동-테스트"><span class="header-section-number">7.2.5</span> Django와 MariaDB 연동 테스트</a></li>
+  <li><a href="#frontend-app-사용을-위한-db-data-retrieval" id="toc-frontend-app-사용을-위한-db-data-retrieval" class="nav-link" data-scroll-target="#frontend-app-사용을-위한-db-data-retrieval"><span class="header-section-number">7.2.6</span> Frontend App 사용을 위한 DB Data Retrieval</a></li>
+  </ul></li>
+  <li><a href="#aqarai-protype" id="toc-aqarai-protype" class="nav-link" data-scroll-target="#aqarai-protype"><span class="header-section-number">7.3</span> AqarAI Protype</a>
+  <ul class="collapse">
+  <li><a href="#기본-eda-기능" id="toc-기본-eda-기능" class="nav-link" data-scroll-target="#기본-eda-기능"><span class="header-section-number">7.3.1</span> 기본 EDA 기능</a></li>
+  <li><a href="#backend-api-서버로-부터-데이터-retrieval-후-모델링" id="toc-backend-api-서버로-부터-데이터-retrieval-후-모델링" class="nav-link" data-scroll-target="#backend-api-서버로-부터-데이터-retrieval-후-모델링"><span class="header-section-number">7.3.2</span> Backend API 서버로 부터 데이터 retrieval 후 모델링</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -224,8 +234,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="데모-구성" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="데모-구성"><span class="header-section-number">7.1</span> 데모 구성</h2>
 <p>API Server (Django), Front-end App with ML</p>
-<section id="mariadb-설치mac기준" class="level3" data-number="7.1.1">
-<h3 data-number="7.1.1" class="anchored" data-anchor-id="mariadb-설치mac기준"><span class="header-section-number">7.1.1</span> MariaDB 설치(Mac기준)</h3>
+<p><strong>데모 앱 Github: https://github.com/ariwells2001/hg2024</strong></p>
+</section>
+<section id="backend-api-server" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="backend-api-server"><span class="header-section-number">7.2</span> Backend API Server</h2>
+<section id="mariadb-설치mac기준" class="level3" data-number="7.2.1">
+<h3 data-number="7.2.1" class="anchored" data-anchor-id="mariadb-설치mac기준"><span class="header-section-number">7.2.1</span> MariaDB 설치(Mac기준)</h3>
 <pre class="{bash}"><code># Mariadb installation
 brew install mariadb
 brew services restart mariadb
@@ -239,16 +253,37 @@ sudo mysql -u root
 use mysql;
 alter user 'root'@'localhost' identified by 'password'</code></pre>
 </section>
-<section id="database에-csv-file-import-하기" class="level3" data-number="7.1.2">
-<h3 data-number="7.1.2" class="anchored" data-anchor-id="database에-csv-file-import-하기"><span class="header-section-number">7.1.2</span> Database에 csv file import 하기</h3>
-<section id="django-서버에서-생성한-테이블에-적합하도록-csv-file-변경하기" class="level4" data-number="7.1.2.1">
-<h4 data-number="7.1.2.1" class="anchored" data-anchor-id="django-서버에서-생성한-테이블에-적합하도록-csv-file-변경하기"><span class="header-section-number">7.1.2.1</span> Django 서버에서 생성한 테이블에 적합하도록 csv file 변경하기</h4>
+<section id="djangomodels.py에-정의된-patterntable" class="level3" data-number="7.2.2">
+<h3 data-number="7.2.2" class="anchored" data-anchor-id="djangomodels.py에-정의된-patterntable"><span class="header-section-number">7.2.2</span> Django(models.py)에 정의된 patternTable</h3>
 <div class="cell" data-execution_count="1">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"integrated_0526_0622.csv"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="1">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#class patternTable(models.Model):</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#    account = models.CharField(max_length=50)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#    timestamp = models.DateTimeField(auto_now_add=True)</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#    co2 = models.FloatField()</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#    temperature = models.FloatField()</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#    humidity = models.FloatField()</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#    door = models.FloatField()</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#    motion = models.FloatField()</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#    fp2 = models.FloatField()</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#    occupancy = models.FloatField()</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#    user = models.ForeignKey(User,on_delete=models.CASCADE)</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#    class Meta:</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">#        db_table = 'patternTable'</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">#    def __str__(self):</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="co">#        return self.account</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="database에-csv-file-import-하기" class="level3" data-number="7.2.3">
+<h3 data-number="7.2.3" class="anchored" data-anchor-id="database에-csv-file-import-하기"><span class="header-section-number">7.2.3</span> Database에 csv file import 하기</h3>
+<section id="django-서버에서-생성한-테이블에-적합하도록-csv-file-변경하기" class="level4" data-number="7.2.3.1">
+<h4 data-number="7.2.3.1" class="anchored" data-anchor-id="django-서버에서-생성한-테이블에-적합하도록-csv-file-변경하기"><span class="header-section-number">7.2.3.1</span> Django 서버에서 생성한 테이블에 적합하도록 csv file 변경하기</h4>
+<div class="cell" data-execution_count="2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"integrated_0526_0622.csv"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="16">
 <div>
 
 
@@ -329,15 +364,15 @@ alter user 'root'@'localhost' identified by 'password'</code></pre>
 </div>
 </div>
 <p>기존 데이터프레임 수정</p>
-<div class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df.reset_index(inplace<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'account'</span>] <span class="op">=</span><span class="st">"ariwells2001@gmail.com"</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'id'</span>] <span class="op">=</span> df.iloc[:,<span class="dv">0</span>] <span class="op">+</span> <span class="dv">1</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'timestamp'</span>] <span class="op">=</span> df[<span class="st">'timestamp'</span>].<span class="bu">str</span>[:<span class="op">-</span><span class="dv">6</span>]</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'user_id'</span>] <span class="op">=</span> <span class="dv">1</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.loc[:,[<span class="st">'id'</span>,<span class="st">'account'</span>,<span class="st">'timestamp'</span>,<span class="st">'co2'</span>,<span class="st">'temperature'</span>,<span class="st">'humidity'</span>,<span class="st">'door'</span>,<span class="st">'motion'</span>,<span class="st">'fp2'</span>,<span class="st">'occupancy'</span>,<span class="st">'user_id'</span>]]</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="2">
+<div class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df.reset_index(inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'account'</span>] <span class="op">=</span><span class="st">"ariwells2001@gmail.com"</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'id'</span>] <span class="op">=</span> df.iloc[:,<span class="dv">0</span>] <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'timestamp'</span>] <span class="op">=</span> df[<span class="st">'timestamp'</span>].<span class="bu">str</span>[:<span class="op">-</span><span class="dv">6</span>]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'user_id'</span>] <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.loc[:,[<span class="st">'id'</span>,<span class="st">'account'</span>,<span class="st">'timestamp'</span>,<span class="st">'co2'</span>,<span class="st">'temperature'</span>,<span class="st">'humidity'</span>,<span class="st">'door'</span>,<span class="st">'motion'</span>,<span class="st">'fp2'</span>,<span class="st">'occupancy'</span>,<span class="st">'user_id'</span>]]</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="17">
 <div>
 
 
@@ -393,10 +428,10 @@ alter user 'root'@'localhost' identified by 'password'</code></pre>
 </div>
 </div>
 </div>
-<div class="cell" data-execution_count="3">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df.to_csv(<span class="st">"iot.csv"</span>,index<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-display" data-execution_count="3">
+<div class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df.to_csv(<span class="st">"iot.csv"</span>,index<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="18">
 <div>
 
 
@@ -453,8 +488,9 @@ alter user 'root'@'localhost' identified by 'password'</code></pre>
 </div>
 </div>
 </section>
-<section id="수정된-csv-file-mariadbmysql에-import하기" class="level4" data-number="7.1.2.2">
-<h4 data-number="7.1.2.2" class="anchored" data-anchor-id="수정된-csv-file-mariadbmysql에-import하기"><span class="header-section-number">7.1.2.2</span> 수정된 csv file Mariadb(mysql)에 import하기</h4>
+</section>
+<section id="수정된-csv-file-mariadbmysql에-import하기" class="level3" data-number="7.2.4">
+<h3 data-number="7.2.4" class="anchored" data-anchor-id="수정된-csv-file-mariadbmysql에-import하기"><span class="header-section-number">7.2.4</span> 수정된 csv file Mariadb(mysql)에 import하기</h3>
 <pre class="{bash}"><code>#mysql에 로그인
 
 #iotuser라는 ID 생성하기
@@ -469,9 +505,265 @@ set foreign_key_checks=0
 load data infile "iot.csv" into table patternTable fields terminated by ',' ignore 1 rows;
 set foreign_key_checks=1  # revert to the original setting
 </code></pre>
-
-
 </section>
+<section id="django와-mariadb-연동-테스트" class="level3" data-number="7.2.5">
+<h3 data-number="7.2.5" class="anchored" data-anchor-id="django와-mariadb-연동-테스트"><span class="header-section-number">7.2.5</span> Django와 MariaDB 연동 테스트</h3>
+<div class="cell" data-execution_count="5">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests,json</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>end_point <span class="op">=</span> <span class="st">'http://127.0.0.1:8000/backend/random/'</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>token <span class="op">=</span> <span class="st">'bcffe3ff7ee5e28fae80c9aa23dc33521823d326'</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> {</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Authorization'</span>: <span class="st">'Token </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(token),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>     <span class="st">'Content-Type'</span>: <span class="st">'application/json;charset=UTF-8'</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>     <span class="st">'DN'</span>:<span class="st">'100'</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url<span class="op">=</span>end_point,headers<span class="op">=</span>headers)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> json.loads(response.text)</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>status <span class="op">=</span> response</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'data is </span><span class="sc">{}</span><span class="st"> and status is </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(data,status))</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;Response [200]&gt;
+data is [{'id': 1719, 'account': 'ariwells2001@gmail.com', 'timestamp': '2023-06-13T12:38:00Z', 'co2': 572.0, 'temperature': 2441.0, 'humidity': 5262.0, 'door': 5492992.0, 'motion': 5499072.0, 'fp2': 0.0, 'occupancy': 0.0, 'user': 1}] and status is &lt;Response [200]&gt;
+     id                 account             timestamp    co2  temperature  \
+0  1719  ariwells2001@gmail.com  2023-06-13T12:38:00Z  572.0       2441.0   
+
+   humidity       door     motion  fp2  occupancy  user  
+0    5262.0  5492992.0  5499072.0  0.0        0.0     1  </code></pre>
+</div>
+</div>
+</section>
+<section id="frontend-app-사용을-위한-db-data-retrieval" class="level3" data-number="7.2.6">
+<h3 data-number="7.2.6" class="anchored" data-anchor-id="frontend-app-사용을-위한-db-data-retrieval"><span class="header-section-number">7.2.6</span> Frontend App 사용을 위한 DB Data Retrieval</h3>
+<p>ML학습을 위한 모든 데이터 Retrieval Endpoint:</p>
+<p>’<a href="http://127.0.0.1:8000/backend/random/'">http://127.0.0.1:8000/backend/pattern/’</a></p>
+<p>Occupancy Detection Simulation을 위한 랜덤데이터 샘플링</p>
+<p>’<a href="http://127.0.0.1:8000/backend/random/'">http://127.0.0.1:8000/backend/random/’</a></p>
+<section id="전체-데이터-retrieval-from-db" class="level4" data-number="7.2.6.1">
+<h4 data-number="7.2.6.1" class="anchored" data-anchor-id="전체-데이터-retrieval-from-db"><span class="header-section-number">7.2.6.1</span> 전체 데이터 Retrieval (from DB)</h4>
+<div class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests,json</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>end_point <span class="op">=</span> <span class="st">'http://127.0.0.1:8000/backend/pattern/'</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>token <span class="op">=</span> <span class="st">'bcffe3ff7ee5e28fae80c9aa23dc33521823d326'</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>headers <span class="op">=</span> {</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">'Authorization'</span>: <span class="st">'Token </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(token),</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>     <span class="st">'Content-Type'</span>: <span class="st">'application/json;charset=UTF-8'</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>     <span class="st">'DN'</span>:<span class="st">'3900'</span></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url<span class="op">=</span>end_point,headers<span class="op">=</span>headers)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(response)</span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> json.loads(response.text)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>status <span class="op">=</span> response</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'status is </span><span class="sc">{}</span><span class="st">'</span>.<span class="bu">format</span>(status))</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(data)</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'id'</span>] <span class="op">=</span> df[<span class="st">'id'</span>]<span class="op">-</span><span class="dv">1</span></span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.sort_values(<span class="st">'id'</span>,ascending<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>df.set_index(<span class="st">'id'</span>,drop<span class="op">=</span><span class="va">True</span>,inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>df.index.name<span class="op">=</span><span class="va">None</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>df.info()</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;Response [200]&gt;
+status is &lt;Response [200]&gt;
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+Index: 3900 entries, 0 to 3899
+Data columns (total 10 columns):
+ #   Column       Non-Null Count  Dtype  
+---  ------       --------------  -----  
+ 0   account      3900 non-null   object 
+ 1   timestamp    3900 non-null   object 
+ 2   co2          3900 non-null   float64
+ 3   temperature  3900 non-null   float64
+ 4   humidity     3900 non-null   float64
+ 5   door         3900 non-null   float64
+ 6   motion       3900 non-null   float64
+ 7   fp2          3900 non-null   float64
+ 8   occupancy    3900 non-null   float64
+ 9   user         3900 non-null   int64  
+dtypes: float64(7), int64(1), object(2)
+memory usage: 335.2+ KB</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="20">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">account</th>
+<th data-quarto-table-cell-role="th">timestamp</th>
+<th data-quarto-table-cell-role="th">co2</th>
+<th data-quarto-table-cell-role="th">temperature</th>
+<th data-quarto-table-cell-role="th">humidity</th>
+<th data-quarto-table-cell-role="th">door</th>
+<th data-quarto-table-cell-role="th">motion</th>
+<th data-quarto-table-cell-role="th">fp2</th>
+<th data-quarto-table-cell-role="th">occupancy</th>
+<th data-quarto-table-cell-role="th">user</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>ariwells2001@gmail.com</td>
+<td>2023-05-26T08:00:00Z</td>
+<td>560.0</td>
+<td>2297.0</td>
+<td>4271.0</td>
+<td>54613010.0</td>
+<td>22018948.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>ariwells2001@gmail.com</td>
+<td>2023-05-26T08:01:00Z</td>
+<td>590.0</td>
+<td>2297.0</td>
+<td>4271.0</td>
+<td>54673025.0</td>
+<td>22078965.0</td>
+<td>0.0</td>
+<td>0.0</td>
+<td>1</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="ml-학습에-사용할-수-있도록-데이터-기본-정제" class="level4" data-number="7.2.6.2">
+<h4 data-number="7.2.6.2" class="anchored" data-anchor-id="ml-학습에-사용할-수-있도록-데이터-기본-정제"><span class="header-section-number">7.2.6.2</span> ML 학습에 사용할 수 있도록 데이터 기본 정제</h4>
+<div class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'timestamp'</span>] <span class="op">=</span> df[<span class="st">'timestamp'</span>].replace(<span class="vs">r'[TZ]'</span>,<span class="vs">r' '</span>,regex<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>df[<span class="st">'timestamp'</span>] <span class="op">=</span> pd.to_datetime(df[<span class="st">'timestamp'</span>])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">'co2'</span>,<span class="st">'door'</span>,<span class="st">'motion'</span>,<span class="st">'fp2'</span>,<span class="st">'occupancy'</span>]] <span class="op">=</span> df[[<span class="st">'co2'</span>,<span class="st">'door'</span>,<span class="st">'motion'</span>,<span class="st">'fp2'</span>,<span class="st">'occupancy'</span>]].astype(<span class="bu">int</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>df[[<span class="st">'temperature'</span>,<span class="st">'humidity'</span>]] <span class="op">=</span> df[[<span class="st">'temperature'</span>,<span class="st">'humidity'</span>]]<span class="op">/</span><span class="dv">100</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df[[<span class="st">'timestamp'</span>,<span class="st">'co2'</span>,<span class="st">'temperature'</span>,<span class="st">'humidity'</span>,<span class="st">'door'</span>,<span class="st">'motion'</span>,<span class="st">'fp2'</span>,<span class="st">'occupancy'</span>]]</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>df.head(<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display" data-execution_count="21">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">timestamp</th>
+<th data-quarto-table-cell-role="th">co2</th>
+<th data-quarto-table-cell-role="th">temperature</th>
+<th data-quarto-table-cell-role="th">humidity</th>
+<th data-quarto-table-cell-role="th">door</th>
+<th data-quarto-table-cell-role="th">motion</th>
+<th data-quarto-table-cell-role="th">fp2</th>
+<th data-quarto-table-cell-role="th">occupancy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>2023-05-26 08:00:00</td>
+<td>560</td>
+<td>22.97</td>
+<td>42.71</td>
+<td>54613010</td>
+<td>22018948</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>2023-05-26 08:01:00</td>
+<td>590</td>
+<td>22.97</td>
+<td>42.71</td>
+<td>54673025</td>
+<td>22078965</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2023-05-26 08:02:00</td>
+<td>590</td>
+<td>22.97</td>
+<td>42.71</td>
+<td>54733026</td>
+<td>22138954</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>2023-05-26 08:03:00</td>
+<td>590</td>
+<td>22.97</td>
+<td>42.71</td>
+<td>54793030</td>
+<td>22198955</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>2023-05-26 08:04:00</td>
+<td>590</td>
+<td>22.97</td>
+<td>42.71</td>
+<td>54853005</td>
+<td>22258939</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="aqarai-protype" class="level2" data-number="7.3">
+<h2 data-number="7.3" class="anchored" data-anchor-id="aqarai-protype"><span class="header-section-number">7.3</span> AqarAI Protype</h2>
+<section id="기본-eda-기능" class="level3" data-number="7.3.1">
+<h3 data-number="7.3.1" class="anchored" data-anchor-id="기본-eda-기능"><span class="header-section-number">7.3.1</span> 기본 EDA 기능</h3>
+<p><img src="images/스크린샷 2023-11-22 오후 9.02.58.png" class="img-fluid"></p>
+</section>
+<section id="backend-api-서버로-부터-데이터-retrieval-후-모델링" class="level3" data-number="7.3.2">
+<h3 data-number="7.3.2" class="anchored" data-anchor-id="backend-api-서버로-부터-데이터-retrieval-후-모델링"><span class="header-section-number">7.3.2</span> Backend API 서버로 부터 데이터 retrieval 후 모델링</h3>
+<ul>
+<li><p><img src="images/스크린샷 2023-11-22 오후 9.16.38.png" class="img-fluid"></p>
+<h3 id="csv-file로-부터-모델링" data-number="7.3.3" class="anchored"><span class="header-section-number">7.3.3</span> csv file로 부터 모델링</h3>
+<p><img src="images/스크린샷 2023-11-22 오후 9.18.35.png" class="img-fluid"></p>
+<h3 id="ai-서비스" data-number="7.3.4" class="anchored"><span class="header-section-number">7.3.4</span> AI 서비스</h3>
+<p>Backend API서버로 부터 마지막 레코드 읽어 온 후 occupancy 유무 예측. 현재는 데모 목적으로 random하게 레코드 읽어 옴.</p>
+<ul>
+<li><p>현재 10초 간격으로 서버로 부터 random하게 레코드 읽어옴</p></li>
+<li><p>scheduler를 사용해서 구현할 예정이나 현재 문제가 있어 while문 사용</p></li>
+<li><p>원하는 모델을 선택하여 예측가능. 모델을 선택하지 않을 경우 현재는 xgboost모델이 사용됨</p></li>
+</ul></li>
+</ul>
+<p><img src="images/스크린샷 2023-11-22 오후 9.19.55.png" class="img-fluid"></p>
+
+
 </section>
 </section>
 
