@@ -6,6 +6,10 @@ title: "Demonstration"
 
 API Server (Django), Front-end App with ML
 
+**데모 앱 Github: https://github.com/ariwells2001/hg2024**
+
+## Backend API Server
+
 ### MariaDB 설치(Mac기준)
 
 ```{bash}
@@ -21,6 +25,28 @@ sudo mysql -u root
 #mysql 로그인 후:
 use mysql;
 alter user 'root'@'localhost' identified by 'password'
+```
+
+### Django(models.py)에 정의된 patternTable
+
+```{python eval=F}
+
+#class patternTable(models.Model):
+#    account = models.CharField(max_length=50)
+#    timestamp = models.DateTimeField(auto_now_add=True)
+#    co2 = models.FloatField()
+#    temperature = models.FloatField()
+#    humidity = models.FloatField()
+#    door = models.FloatField()
+#    motion = models.FloatField()
+#    fp2 = models.FloatField()
+#    occupancy = models.FloatField()
+#    user = models.ForeignKey(User,on_delete=models.CASCADE)
+
+#    class Meta:
+#        db_table = 'patternTable'
+#    def __str__(self):
+#        return self.account
 ```
 
 ### Database에 csv file import 하기
@@ -53,7 +79,7 @@ df.to_csv("iot.csv",index=False)
 df.head(2)
 ```
 
-#### 수정된 csv file Mariadb(mysql)에 import하기
+### 수정된 csv file Mariadb(mysql)에 import하기
 
 ```{bash}
 #mysql에 로그인
@@ -72,8 +98,104 @@ set foreign_key_checks=1  # revert to the original setting
 
 ```
 
-#### Django와 MariaDB 연동 테스트
+### Django와 MariaDB 연동 테스트
 
 ```{python}
+import requests,json
+import pandas as pd
 
+
+end_point = 'http://127.0.0.1:8000/backend/random/'
+
+token = 'bcffe3ff7ee5e28fae80c9aa23dc33521823d326'
+
+headers = {
+    'Authorization': 'Token {}'.format(token),
+     'Content-Type': 'application/json;charset=UTF-8',
+     'DN':'100'
+}
+response = requests.get(url=end_point,headers=headers)
+print(response)
+data = json.loads(response.text)
+status = response
+df = pd.DataFrame(data)
+print('data is {} and status is {}'.format(data,status))
+print(df.head())
 ```
+
+### Frontend App 사용을 위한 DB Data Retrieval
+
+ML학습을 위한 모든 데이터 Retrieval Endpoint:
+
+'[http://127.0.0.1:8000/backend/pattern/'](http://127.0.0.1:8000/backend/random/')
+
+Occupancy Detection Simulation을 위한 랜덤데이터 샘플링
+
+'[http://127.0.0.1:8000/backend/random/'](http://127.0.0.1:8000/backend/random/')
+
+#### 전체 데이터 Retrieval (from DB)
+
+```{python}
+import requests,json
+import pandas as pd
+
+
+end_point = 'http://127.0.0.1:8000/backend/pattern/'
+
+token = 'bcffe3ff7ee5e28fae80c9aa23dc33521823d326'
+
+headers = {
+    'Authorization': 'Token {}'.format(token),
+     'Content-Type': 'application/json;charset=UTF-8',
+     'DN':'3900'
+}
+response = requests.get(url=end_point,headers=headers)
+print(response)
+data = json.loads(response.text)
+status = response
+print('status is {}'.format(status))
+df = pd.DataFrame(data)
+df['id'] = df['id']-1
+df = df.sort_values('id',ascending=True)
+df.set_index('id',drop=True,inplace=True)
+df.index.name=None
+df.info()
+df.head(2)
+```
+
+#### ML 학습에 사용할 수 있도록 데이터 기본 정제
+
+```{python}
+df['timestamp'] = df['timestamp'].replace(r'[TZ]',r' ',regex=True)
+df['timestamp'] = pd.to_datetime(df['timestamp'])
+df[['co2','door','motion','fp2','occupancy']] = df[['co2','door','motion','fp2','occupancy']].astype(int)
+df[['temperature','humidity']] = df[['temperature','humidity']]/100
+df = df[['timestamp','co2','temperature','humidity','door','motion','fp2','occupancy']]
+df.head(5)
+```
+
+## AqarAI Protype
+
+### 기본 EDA 기능
+
+![](images/스크린샷 2023-11-22 오후 9.02.58.png)
+
+### Backend API 서버로 부터 데이터 retrieval 후 모델링
+
+-   ![](images/스크린샷 2023-11-22 오후 9.16.38.png)
+
+    ### csv file로 부터 모델링
+
+    ![](images/스크린샷 2023-11-22 오후 9.18.35.png)
+
+    ### AI 서비스
+
+    Backend API서버로 부터 마지막 레코드 읽어 온 후 occupancy 유무 예측. 현재는 데모 목적으로 random하게 레코드 읽어 옴.
+
+    -   현재 10초 간격으로 서버로 부터 random하게 레코드 읽어옴
+
+    -   scheduler를 사용해서 구현할 예정이나 현재 문제가 있어 while문 사용
+
+    -   원하는 모델을 선택하여 예측가능. 모델을 선택하지 않을 경우 현재는 xgboost모델이 사용됨
+
+![](images/스크린샷 2023-11-22 오후 9.19.55.png)
