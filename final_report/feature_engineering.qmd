@@ -1,5 +1,5 @@
 ---
-title: "Feature_Engineering"
+title: "Feature Engineering"
 ---
 
 ```{r include=F}
@@ -10,7 +10,7 @@ library(data.table)
 library(tidyverse)
 library(tidymodels)
 library(rsample)
-
+library(plyr)
 
 ```
 
@@ -21,33 +21,189 @@ library(rsample)
 dat <- read.csv("eda.csv")
 dat %>% str()
 
-dat <- dat %>% 
+dat_m <- dat %>% 
   select(-X) %>% 
   mutate(timestamp= as.POSIXct(timestamp)) %>% 
   mutate_if(is.character, as.factor)
 
-dat %>% str()
+dat_m <- dat %>% 
+  select(-c(timestamp,year,month,day,minute))
+splits <- dat_m %>% nrow()*0.8
+train <- dat_m[1:splits,]
+test <- dat_m[(splits+1):(dat_m %>% nrow()),]
+train %>% nrow()
+test %>% nrow()
 
+dat_m%>% is.na() %>% colSums()
+
+write.csv(train,"train.csv")
+write.csv(test,"test.csv")
+```
+
+## Feature Engineering
+
+### 불쾌 지수
+
+```{r include=F}
+# discomfort_index & discrete value using adply function
+
+two_discomfort <- function(df) {
+  temperature <- df$temperature
+  humidity <- df$humidity
+  discomfort <- 1.8*temperature - 0.55*(1 - humidity/100)*(1.8*temperature - 26) + 32
+  if (discomfort >= 83) {
+    return(data.frame(discomfort_index =discomfort, discomfort_rank = as.integer(12)))
+  } else if (discomfort >= 80 & discomfort < 83) {
+      return(data.frame(discomfort_index =discomfort, discomfort_rank = as.integer(10)))
+  } else if (discomfort >= 75 & discomfort < 80) {
+      return(data.frame(discomfort_index =discomfort, discomfort_rank = as.integer(8)))
+  } else if (discomfort >= 70 & discomfort < 75) {
+      return(data.frame(discomfort_index =discomfort, discomfort_rank = as.integer(6)))
+  } else if (discomfort >= 68 & discomfort < 70) {
+      return(data.frame(discomfort_index =discomfort, discomfort_rank = as.integer(4)))
+
+  } else {
+      return(data.frame(discomfort_index =discomfort, discomfort_rank = as.integer(2)))
+  }
+}
+
+# discrete value only using adply function
+
+s_discomfort <- function(df) {
+  temperature <- df$temperature
+  humidity <- df$humidity
+  discomfort <- 1.8*temperature - 0.55*(1 - humidity/100)*(1.8*temperature - 26) + 32
+  
+  result <- case_when(
+  discomfort >= 83 ~ data.frame(discomfort_index = as.integer(12)),
+  discomfort >= 80 & discomfort < 83 ~ data.frame(discomfort_index = as.integer(10)),
+  discomfort >= 75 & discomfort < 80 ~ data.frame(discomfort_index = as.integer(8)),
+  discomfort >= 70 & discomfort < 75 ~ data.frame(discomfort_index = as.integer(6)),
+  discomfort >= 68 & discomfort < 70 ~ data.frame(discomfort_index = as.integer(4)),
+  TRUE ~ data.frame(discomfort_index = as.integer(2))
+  )
+  return (result)
+}
+```
+
+```{r}
+# discrete value only with two arguements
+
+f_discomfort <- function(x1,x2) {
+  temperature <- x1
+  humidity <- x2
+  discomfort <- 1.8*temperature - 0.55*(1 - humidity/100)*(1.8*temperature - 26) + 32
+  
+  result <- case_when(
+  discomfort >= 83 ~ as.integer(12),
+  discomfort >= 80 & discomfort < 83 ~ as.integer(10),
+  discomfort >= 75 & discomfort < 80 ~ as.integer(8),
+  discomfort >= 70 & discomfort < 75 ~ as.integer(6),
+  discomfort >= 68 & discomfort < 70 ~ as.integer(4),
+  TRUE ~ as.integer(2)
+  )
+  return (result)
+}
+```
+
+```{r}
+dat1 <- dat
+dat1$discomfort_index <- with(dat1,f_discomfort(temperature,humidity))
+#dat<- adply(dat,1,s_discomfort)
+#dat <- adply(dat,1,two_discomfort)
+dat1 |> str()
+```
+
+```{r include=F}
+window_size <- 5  # Adjust the window size as per your preference
+rolling_features <- c('co2', 'temperature', 'humidity', 'motion', 'door')
+
+for (feature in rolling_features) {
+  dat1[paste0(feature, '_rolling_std')] <- zoo::rollapply(dat1[[feature]], window_size, mean, fill = NA, align = "right")
+}
+
+# Create interaction features
+interaction_features <- list(c('co2', 'temperature'), c('co2', 'humidity'))
+for (interaction in interaction_features) {
+  feature1 <- interaction[1]
+  feature2 <- interaction[2]
+  dat1[paste0(feature1, '_', feature2, '_interaction')] <- dat1[[feature1]] * (dat1[[feature2]]/10)
+}
+
+# Create lagged features
+lagged_features <- c('co2', 'temperature', 'humidity')
+lag_steps <- c(1, 2, 3, 4, 5)  # Adjust the lag steps as per your preference
+for (feature in lagged_features) {
+  for (lag in lag_steps) {
+    dat1[paste0(feature, '_lag', lag)] <- lag(dat1[[feature]], lag)
+  }
+}
+
+### Training ###
+dat1 <- dat1[complete.cases(dat1),]
+
+
+```
+
+### 이동표준편차
+
+```{r}
+
+window_size <- 5  # Adjust the window size as per your preference
+rolling_features <- c('co2', 'temperature', 'humidity', 'motion', 'door')
+
+# Group by 'day' and apply rolling sd
+dat1 <- dat1 %>%
+  group_by(day) %>%
+  mutate(across(rolling_features, ~zoo::rollapply(.x, window_size, sd, fill = NA, align = "right"), .names = "{.col}_rolling_std")) |> 
+  ungroup() 
+```
+
+### Interaction
+
+```{r}
+# Create interaction features within each day group
+interaction_features <- list(c('co2', 'temperature'), c('co2', 'humidity'))
+dat1 <- dat1 %>%
+  group_by(day) %>%
+  mutate(across(interaction_features, ~.x[[1]] * (.x[[2]]/10), .names = "{interaction[[1]]}_{interaction[[2]]}_interaction")) |> 
+  ungroup() 
+```
+
+### Lag
+
+```{r}
+# Create lagged features within each day group
+lagged_features <- c('co2', 'temperature', 'humidity')
+lag_steps <- c(1, 2, 3, 4, 5)  # Adjust the lag steps as per your preference
+
+dat1 <- dat1 %>%
+  group_by(day) %>%
+  mutate(across(lagged_features, ~lag(.x, lag_steps))) |> 
+  ungroup()
+
+### Final Dataset ###
+dat1 <- dat1[complete.cases(dat1),]
+str(dat1)
 ```
 
 ## Train/Test 셋 분리
 
 ```{r}
-dat <- dat %>% 
+dat1 <- dat1 %>% 
   select(-c(timestamp,year,month,day,minute))
-splits <- dat %>% nrow()*0.8
-train <- dat[1:splits,]
-test <- dat[(splits+1):(dat %>% nrow()),]
-train %>% nrow()
-test %>% nrow()
+splits <- dat1 %>% nrow()*0.8
+train_1 <- dat1[1:splits,]
+test_1 <- dat1[(splits+1):(dat1 %>% nrow()),]
+train_1 %>% nrow()
+test_1 %>% nrow()
 ```
 
 ```{r}
-dat%>% is.na() %>% colSums()
-
+dat1 |> is.na() |> colSums()
 ```
 
 ```{r}
-write.csv(train,"train.csv")
-write.csv(test,"test.csv")
+write.csv(train_1,"train_1.csv")
+write.csv(test_1,"test_1.csv")
 ```

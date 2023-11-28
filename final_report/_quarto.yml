@@ -12,6 +12,8 @@ book:
     - feature_engineering.qmd
     - modeling.qmd
     - evaluation.qmd
+    - modeling_python.qmd
+    - evaluation_python.qmd
     - report.qmd
     - demonstration.qmd
 

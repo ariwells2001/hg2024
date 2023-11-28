@@ -12,24 +12,25 @@ API Server (Django), Front-end App with ML
 
 ### MariaDB 설치(Mac기준)
 
-```{bash}
-# Mariadb installation
-brew install mariadb
-brew services restart mariadb
+```{python}
+### Shell & MySQL COMMANDS
 
-#restart MAC
+##Mariadb installation
+#brew install mariadb
+#brew services restart mariadb
 
+##restart MAC
 # password 없이 mysql에 로그인
-sudo mysql -u root
+#sudo mysql -u root
 
-#mysql 로그인 후:
-use mysql;
-alter user 'root'@'localhost' identified by 'password'
+##mysql 로그인 후:
+#use mysql;
+#alter user 'root'@'localhost' identified by 'password'
 ```
 
 ### Django(models.py)에 정의된 patternTable
 
-```{python eval=F}
+```{python}
 
 #class patternTable(models.Model):
 #    account = models.CharField(max_length=50)
@@ -81,20 +82,23 @@ df.head(2)
 
 ### 수정된 csv file Mariadb(mysql)에 import하기
 
-```{bash}
+```{python}
+
+### MYSQL COMMANDS
+
 #mysql에 로그인
 
-#iotuser라는 ID 생성하기
-create user 'iotuser'@'localhost' identified by 'iot12345';
-create user 'iotuser'@'%' identified by 'iot12345';
-grant all privileges on *.* to 'iotuser'@'localhost';
-grant all privileges on *.* to 'iotuser'@'%';
-flush privileges;
+##iotuser라는 ID 생성하기
+#create user 'iotuser'@'localhost' identified by 'iot12345';
+#create user 'iotuser'@'%' identified by 'iot12345';
+#grant all privileges on *.* to 'iotuser'@'localhost';
+#grant all privileges on *.* to 'iotuser'@'%';
+#flush privileges;
 
-#Django에서 생성된 테이블(patternTablee)의 user라는 foreign_key를 import시 체크하지 않도록 설정
-set foreign_key_checks=0
-load data infile "iot.csv" into table patternTable fields terminated by ',' ignore 1 rows;
-set foreign_key_checks=1  # revert to the original setting
+##Django에서 생성된 테이블(patternTablee)의 user라는 foreign_key를 import시 체크하지 않도록 설정
+#set foreign_key_checks=0
+#load data infile "iot.csv" into table patternTable fields terminated by ',' ignore 1 rows;
+#set foreign_key_checks=1  # revert to the original setting
 
 ```
 
@@ -176,17 +180,19 @@ df.head(5)
 
 ## AqarAI Protype
 
+-   Backend API Server로 부터 발급 받은 access token을 먼저 입력해야 함
+
 ### 기본 EDA 기능
 
-![](images/스크린샷 2023-11-22 오후 9.02.58.png)
+![](images/스크린샷%202023-11-22%20오후%209.02.58.png)
 
 ### Backend API 서버로 부터 데이터 retrieval 후 모델링
 
--   ![](images/스크린샷 2023-11-22 오후 9.16.38.png)
+-   ![](images/스크린샷%202023-11-22%20오후%209.16.38.png)
 
     ### csv file로 부터 모델링
 
-    ![](images/스크린샷 2023-11-22 오후 9.18.35.png)
+    ![](images/스크린샷%202023-11-22%20오후%209.18.35.png)
 
     ### AI 서비스
 
@@ -198,4 +204,4 @@ df.head(5)
 
     -   원하는 모델을 선택하여 예측가능. 모델을 선택하지 않을 경우 현재는 xgboost모델이 사용됨
 
-![](images/스크린샷 2023-11-22 오후 9.19.55.png)
+![](images/스크린샷%202023-11-22%20오후%209.19.55.png)

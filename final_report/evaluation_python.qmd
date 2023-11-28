@@ -1,0 +1,164 @@
+---
+title: "Tuning & Evaluation - Python"
+---
+
+## Evaluation - XGBOOST 모델
+
+Cross Validation 기반하에 채택된 XGBOOST 모델을 평가해 본다.
+
+## Library Loading
+
+```{python}
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import time
+from imblearn.over_sampling import SMOTE,RandomOverSampler
+import matplotlib.pyplot as plt
+import joblib
+import warnings
+
+from sklearn.model_selection import train_test_split,StratifiedKFold,KFold,GridSearchCV
+from sklearn.preprocessing import StandardScaler, MinMaxScaler,Normalizer,OneHotEncoder
+from sklearn.metrics import accuracy_score,roc_auc_score,confusion_matrix,classification_report, roc_curve
+from sklearn import set_config
+from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.compose import ColumnTransformer, make_column_transformer
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from xgboost import XGBClassifier,plot_importance
+from lightgbm import LGBMClassifier
+#from catboost import CatBoostClassifier
+warnings.filterwarnings("ignore")
+```
+
+## Data Loading
+
+```{python}
+train = pd.read_csv("train_1.csv")
+test = pd.read_csv("test_1.csv")
+
+train = train.iloc[:,2:]
+test = test.iloc[:,2:]
+train['fp2'] = np.where(train['fp2']=="non_detection",0,1)
+test['fp2'] = np.where(test['fp2']=="non_detection",0,1)
+train["occupancy"] = np.where(train["occupancy"] == "non_detection",0,1)
+test["occupancy"]= np.where(test["occupancy"] == "non_detection",0,1)
+
+train_X = train.drop(['occupancy',"weekday"],axis=1)
+train_y = train[['occupancy']]
+smote = SMOTE(random_state=2023,k_neighbors=7)
+train_X,train_y = smote.fit_resample(train_X,train_y)
+test_X = test.drop(['occupancy',"weekday"],axis=1)
+test_y = test[['occupancy']]
+
+```
+
+## Modeling - XGBOOST
+
+### Pipeline - Preprocessing
+
+```{python}
+num_columns = train_X.select_dtypes('number').columns
+cat_columns = train_X.select_dtypes('object').columns
+
+num_pipe = Pipeline([("scaler",StandardScaler())])
+cat_pipe = make_pipeline(
+  OneHotEncoder(handle_unknown="ignore",sparse_output=False)
+)
+
+preprocess = ColumnTransformer(
+  [("num_process",num_pipe,num_columns) ,
+  ("cat_process",cat_pipe,cat_columns)], remainder="passthrough"
+)
+
+
+```
+
+### Pipeline - Cross Validation
+
+```{python}
+cv = KFold(n_splits=5,shuffle=False)
+pipe_xgboost = Pipeline(
+  [
+    ("preprocess",preprocess),
+    ("classifier",XGBClassifier())
+  ]
+)
+
+XGBM_param = {"classifier__learning_rate": np.arange(0.5,1,0.1),
+              "classifier__n_estimators": np.arange(50,500,50) ,
+              "classifier__max_depth": np.arange(2,5,1)
+              }
+
+start_time = time.time()
+
+XGBM_search = GridSearchCV(estimator = pipe_xgboost,
+                      param_grid = XGBM_param,
+                      cv = cv,
+                      scoring = "roc_auc")
+                      
+XGBM_search.fit(train_X,train_y)
+print("\n")
+print(f"모델링 적합 시간: {time.time()-start_time}s")
+print("\n")
+print("---------------------------------------------------------------------------")
+print(f"XGBOOST Best Score: {XGBM_search.best_score_}")
+print(f"XGBOOST Best Parameters: {XGBM_search.best_params_}")
+print("---------------------------------------------------------------------------")
+```
+
+### Final Modeling
+
+```{python}
+pipe_final = Pipeline(
+  [
+    ("preprocess",preprocess),
+    ("classifier",XGBClassifier(n_estimators = 50,
+                                learning_rate =  0.6,
+                                max_depth = 2))
+  ]
+)
+
+pipe_final.fit(train_X,train_y)
+```
+
+### Evaluation with Final Model/Test Dataset
+
+```{python}
+pred = pipe_final.predict(test_X)
+pred_proba = pipe_final.predict_proba(test_X)[:,1]
+print("\n")
+print("----------------------------------------------------------")
+print("-------------------Major Metrics--------------------------")
+print("----------------------------------------------------------")
+print(classification_report(test_y,pred))
+print("----------------------------------------------------------")
+print("\n")
+
+```
+
+```{python}
+def roc_curve_plot(test_y, pred_proba):
+  fprs, tprs,thresholds = roc_curve(test_y,pred_proba)
+  plt.plot(fprs,tprs,label="ROC")
+  plt.plot([0,1],'k--',label="Random")
+  start,end = plt.xlim()
+  plt.xticks(np.round(np.arange(start,end,0.1),2))
+  plt.xlim(0,1);plt.ylim(0,1)
+  plt.xlabel('FPR(1-Specificity)'); plt.ylabel('TPR(Recal)')
+  plt.legend()
+  plt.show()
+
+
+print("----------------------------------------------------------")
+print("---------------------ROC AUC Score------------------------")
+print(f"--------------------{roc_auc_score(test_y,pred_proba)}--------------------")
+print("-----------------------ROC Curve--------------------------")
+print("----------------------------------------------------------")
+
+roc_curve_plot(test_y,pred_proba)
+
+```

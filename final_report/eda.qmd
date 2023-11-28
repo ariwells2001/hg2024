@@ -22,7 +22,7 @@ library(skimr)
 
 ```{r}
 aqara <- fread("integrated_0526_0622.csv")
-aqara <- aqara %>% 
+aqara <- aqara |>  
   mutate(fp2 = factor(fp2,labels=c("non_detection","detection")),
          occupancy = factor(occupancy,labels=c("non_detection","detection")),
          timestamp = timestamp - 15*3600)
@@ -31,14 +31,14 @@ aqara <- aqara %>%
 ### Skimming Data
 
 ```{r}
-aqara %>% str()
-aqara %>% skim()
+aqara |>  str()
+aqara |>  skim()
 ```
 
 ### 날짜/시간 관련 파생변수 생성
 
 ```{r}
-aqara <- aqara %>% 
+aqara <- aqara |>  
   mutate(year = year(timestamp),
          month = month(timestamp),
          day = day(timestamp),
@@ -47,7 +47,7 @@ aqara <- aqara %>%
          minute = minute(timestamp),
          temperature = temperature/100,
          humidity = humidity/100) 
-aqara %>% 
+aqara |>  
   head()
 ```
 
@@ -56,9 +56,9 @@ aqara %>%
 ### 박스플롯
 
 ```{r}
-aqara %>% 
-  select_if(is.numeric) %>%
-  gather() %>% 
+aqara |>  
+  select_if(is.numeric) |> 
+  gather() |>  
   ggplot(mapping=aes(x=value,fill=key)) +
   facet_wrap(~key,scale='free')+
   geom_boxplot() +
@@ -69,9 +69,9 @@ aqara %>%
 ### 히스토그램
 
 ```{r}
-aqara %>% 
-  select_if(is.numeric) %>% 
-  pivot_longer(cols=everything()) %>% 
+aqara |>  
+  select_if(is.numeric) |>  
+  pivot_longer(cols=everything()) |>  
   ggplot(mapping=aes(x=value,fill=name)) +
   geom_histogram() +
   facet_wrap(~name,scale='free') +
@@ -94,11 +94,11 @@ plot_boxplot(aqara,by = "fp2",ncol=3)
 ### Occupancy 유무에 따른 범주형 변수 박스플롯
 
 ```{r}
-plot_bar(data=aqara %>% select(-timestamp),by="occupancy",ncol=2)
+plot_bar(data=aqara |>  select(-timestamp),by="occupancy",ncol=2)
 ```
 
 ```{r}
-aqara <- aqara %>% 
+aqara <- aqara |>  
   filter(!weekday=='Sunday') 
 ```
 
@@ -108,32 +108,47 @@ aqara <- aqara %>%
 plot_boxplot(aqara,by = "weekday",ncol=3)
 ```
 
+### 상관계수
+
+```{r}
+aqara |> 
+  select(co2,temperature,humidity,door,motion,hour,fp2) |> 
+  plot_correlation(cor_args = list(use ="complete.obs"))
+```
+
 ### Occupancy 유무에 따른 pairs플롯 및 기타
 
 ```{r}
-aqara %>% 
+aqara |> 
+  select(co2,temperature,humidity,door,motion,hour,occupancy) |> 
   ggpairs(aes(fill=occupancy))
 
 ```
 
 ```{r}
-aqara %>% 
+aqara |>  
   ggplot(aes(x=occupancy,y=co2)) +
   geom_boxplot()
 ```
 
 ```{r}
 aqara %>% 
-  group_by(occupancy) %>% 
-  summarise(min = min(co2),
-            mean = mean(co2),
-            max = max(co2))
+  ggplot(aes(x=weekday,y=co2),col=weekday) +
+  geom_boxplot()
 ```
 
 ```{r}
-aqara %>% 
-  ggplot(aes(x=weekday,y=co2),col=weekday) +
-  geom_boxplot()
+aqara |>  
+  group_by(occupancy) |>  
+  summarise(min_co2 = min(co2),
+            mean_co2 = mean(co2),
+            max_co2 = max(co2),
+            min_temperature = min(temperature)*100,
+            mean_temperature = mean(temperature)*100,
+            max_temperature = max(temperature)*100,
+            min_humidity = min(humidity)*100,
+            mean_humidity = mean(humidity)*100,
+            max_humidity = max(humidity)*100)
 ```
 
 ## EDA 데이터 저장

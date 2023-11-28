@@ -1,0 +1,234 @@
+---
+title: "Modeling - Python"
+---
+
+## Library Loading
+
+```{python}
+
+import pandas as pd
+import numpy as np
+from datetime import datetime
+import time
+from imblearn.over_sampling import SMOTE,RandomOverSampler
+import joblib
+import warnings
+
+from sklearn.model_selection import train_test_split,StratifiedKFold,KFold,GridSearchCV
+from sklearn.preprocessing import StandardScaler, MinMaxScaler,Normalizer,OneHotEncoder
+from sklearn.metrics import accuracy_score,roc_auc_score,confusion_matrix,classification_report
+from sklearn import set_config
+from sklearn.pipeline import make_pipeline, Pipeline
+from sklearn.compose import ColumnTransformer, make_column_transformer
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from xgboost import XGBClassifier
+from lightgbm import LGBMClassifier
+#from catboost import CatBoostClassifier
+warnings.filterwarnings("ignore")
+
+```
+
+## Data Loading
+
+```{python}
+
+train = pd.read_csv("train_1.csv")
+test = pd.read_csv("test_1.csv")
+
+train = train.iloc[:,2:]
+test = test.iloc[:,2:]
+train['fp2'] = np.where(train['fp2']=="non_detection",0,1)
+test['fp2'] = np.where(test['fp2']=="non_detection",0,1)
+train["occupancy"] = np.where(train["occupancy"] == "non_detection",0,1)
+test["occupancy"]= np.where(test["occupancy"] == "non_detection",0,1)
+
+train_X = train.drop(['occupancy',"weekday"],axis=1)
+train_y = train[['occupancy']]
+smote = SMOTE(random_state=2023,k_neighbors=7)
+train_X,train_y = smote.fit_resample(train_X,train_y)
+test_X = test.drop(['occupancy',"weekday"],axis=1)
+test_y = test[['occupancy']]
+
+```
+
+```{python}
+train_X.info()
+```
+
+## Pipeline - Preprocessing
+
+```{python}
+num_columns = train_X.select_dtypes('number').columns
+cat_columns = train_X.select_dtypes('object').columns
+
+num_pipe = Pipeline([("scaler",StandardScaler())])
+cat_pipe = make_pipeline(
+  OneHotEncoder(handle_unknown="ignore",sparse_output=False)
+)
+
+preprocess = ColumnTransformer(
+  [("num_process",num_pipe,num_columns) ,
+  ("cat_process",cat_pipe,cat_columns)], remainder="passthrough"
+)
+```
+
+## Pipeline - Modeling
+
+```{python}
+cv = KFold(n_splits=5,shuffle=False)
+```
+
+### Random Forest
+
+```{python}
+pipe_rf = Pipeline(
+  [
+    ("preprocess",preprocess),
+    ("classifier",RandomForestClassifier())
+  ]
+)
+
+RandomForest_param = {'classifier__max_features': np.arange(0.5,1,0.1)}
+
+start_time = time.time()
+
+RandomForest_search = GridSearchCV(estimator = pipe_rf,
+                      param_grid = RandomForest_param,
+                      cv = cv,
+                      scoring = "roc_auc")
+                      
+RandomForest_search.fit(train_X,train_y)
+print(f"{time.time()-start_time}s")
+print(f"Random Forest Best Score: {RandomForest_search.best_score_}")
+
+pred = RandomForest_search.predict(test_X)
+print(classification_report(test_y,pred))
+```
+
+### Decision Tree
+
+```{python}
+pipe_decisiontree = Pipeline(
+  [
+    ("preprocess",preprocess),
+    ("classifier",DecisionTreeClassifier())
+  ]
+)
+
+decisiontree_param = {'classifier__ccp_alpha': np.arange(0.1,1,0.1)}
+
+start_time = time.time()
+
+decisiontree_search = GridSearchCV(estimator = pipe_decisiontree,
+                      param_grid = decisiontree_param,
+                      cv = cv,
+                      scoring = "roc_auc")
+                      
+decisiontree_search.fit(train_X,train_y)
+print(f"{time.time()-start_time}s")
+print(f"Decision Tree Best Score: {decisiontree_search.best_score_}")
+
+pred = decisiontree_search.predict(test_X)
+print(classification_report(test_y,pred))
+```
+
+### Support Vector Machine
+
+```{python}
+pipe_svc = Pipeline(
+  [
+    ("preprocess",preprocess),
+    ("classifier",SVC())
+  ]
+)
+
+SVC_param = {"classifier__C": np.arange(1,100,20)}
+
+start_time = time.time()
+
+SVC_search = GridSearchCV(estimator = pipe_svc,
+                      param_grid = SVC_param,
+                      cv = cv,
+                      scoring = "roc_auc")
+                      
+SVC_search.fit(train_X,train_y)
+print(f"{time.time()-start_time}s")
+print(f"SVM Classifier Best Score: {SVC_search.best_score_}")
+
+pred = SVC_search.predict(test_X)
+print(classification_report(test_y,pred))
+```
+
+### XGBOOST
+
+```{python}
+
+pipe_xgboost = Pipeline(
+  [
+    ("preprocess",preprocess),
+    ("classifier",XGBClassifier())
+  ]
+)
+
+XGBM_param = {"classifier__learning_rate": np.arange(0.5,1,0.1)}
+
+start_time = time.time()
+
+XGBM_search = GridSearchCV(estimator = pipe_xgboost,
+                      param_grid = XGBM_param,
+                      cv = cv,
+                      scoring = "roc_auc")
+                      
+XGBM_search.fit(train_X,train_y)
+print(f"{time.time()-start_time}s")
+print(f"XGBOOST Best Score: {XGBM_search.best_score_}")
+
+pred = XGBM_search.predict(test_X)
+print(classification_report(test_y,pred))
+```
+
+### Light GBM
+
+messages가 많아 comments처리함
+
+```{python}
+#pipe_lgbm = Pipeline(
+#  [
+#    ("preprocess",preprocess),
+#    ("classifier",LGBMClassifier(force_col_wise=True))
+#  ]
+#)
+
+#LGBM_param = {"classifier__learning_rate": np.arange(0.5,1,0.1)}
+
+#start_time = time.time()
+
+#LGBM_search = GridSearchCV(estimator = pipe_lgbm,
+#                      param_grid = LGBM_param,
+#                      cv = cv,
+#                      scoring = "roc_auc")
+                      
+#LGBM_search.fit(train_X,train_y)
+#print(f"{time.time()-start_time}s")
+#print(f"LGBM Best Score: {LGBM_search.best_score_}")
+
+#pred = LGBM_search.predict(test_X)
+#print(classification_report(test_y,pred))
+```
+
+### Best Score / Best Parameter
+
+```{python}
+print(f"Random Forest Best Score: {RandomForest_search.best_score_}")
+print(f"Random Forest Best Parameters: {RandomForest_search.best_params_}")
+print(f"Decision Tree Best Score: {decisiontree_search.best_score_}")
+print(f"Decision Tree Best Parameters: {decisiontree_search.best_params_}")
+print(f"SVM Classifier Best Score: {SVC_search.best_score_}")
+print(f"SVM Classifier Best Parameters: {SVC_search.best_params_}")
+print(f"XGBOOST Best Score: {XGBM_search.best_score_}")
+print(f"XGBOOST Best Parameters: {XGBM_search.best_params_}")
+
+```
