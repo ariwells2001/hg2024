@@ -154,7 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./feature_engineering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature_Engineering</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature Engineering</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -166,13 +166,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./evaluation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Evaluation</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tuning &amp; Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modeling_python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Modeling - Python</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluation_python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Tuning &amp; Evaluation - Python</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./report.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Conclusion</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Conclusion</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demonstration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Demonstration</span></span></a>
   </div>
 </li>
     </ul>
@@ -280,17 +298,18 @@ Computational engine: glm </code></pre>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull_workflow_fit</span>() <span class="sc">%&gt;%</span> </span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 8 × 5
+<pre><code># A tibble: 9 × 5
   term              estimate std.error statistic  p.value
   &lt;chr&gt;                &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 (Intercept)         -1.04     0.0894    -11.6  4.71e-31
-2 co2                 -0.726    0.0787     -9.22 3.03e-20
-3 temperature         -0.716    0.0710    -10.1  6.63e-24
-4 humidity             0.269    0.0790      3.40 6.77e- 4
-5 door                -3.88     0.446      -8.69 3.54e-18
-6 motion               4.19     0.436       9.60 8.10e-22
-7 hour                -0.310    0.0621     -5.00 5.87e- 7
-8 fp2_non_detection    4.49     0.240      18.7  5.14e-78</code></pre>
+1 (Intercept)         -1.17     0.102     -11.5  1.86e-30
+2 X.1                 -0.736    0.102      -7.24 4.60e-13
+3 co2                 -0.667    0.0822     -8.10 5.29e-16
+4 temperature         -0.332    0.0867     -3.83 1.28e- 4
+5 humidity             0.364    0.0874      4.17 3.07e- 5
+6 door                -4.11     0.481      -8.54 1.33e-17
+7 motion               4.40     0.456       9.63 5.78e-22
+8 hour                -0.159    0.0656     -2.42 1.53e- 2
+9 fp2_non_detection    4.97     0.274      18.2  1.04e-73</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -302,29 +321,29 @@ Computational engine: glm </code></pre>
 
                Reference
 Prediction      detection non_detection
-  detection           437            91
-  non_detection         8           148
-                                          
-               Accuracy : 0.8553          
-                 95% CI : (0.8266, 0.8808)
-    No Information Rate : 0.6506          
-    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
-                                          
-                  Kappa : 0.6538          
-                                          
- Mcnemar's Test P-Value : &lt; 2.2e-16       
-                                          
-            Sensitivity : 0.9820          
-            Specificity : 0.6192          
-         Pos Pred Value : 0.8277          
-         Neg Pred Value : 0.9487          
-             Prevalence : 0.6506          
-         Detection Rate : 0.6389          
-   Detection Prevalence : 0.7719          
-      Balanced Accuracy : 0.8006          
-                                          
-       'Positive' Class : detection       
-                                          </code></pre>
+  detection           443           129
+  non_detection         2           110
+                                         
+               Accuracy : 0.8085         
+                 95% CI : (0.777, 0.8373)
+    No Information Rate : 0.6506         
+    P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
+                                         
+                  Kappa : 0.5197         
+                                         
+ Mcnemar's Test P-Value : &lt; 2.2e-16      
+                                         
+            Sensitivity : 0.9955         
+            Specificity : 0.4603         
+         Pos Pred Value : 0.7745         
+         Neg Pred Value : 0.9821         
+             Prevalence : 0.6506         
+         Detection Rate : 0.6477         
+   Detection Prevalence : 0.8363         
+      Balanced Accuracy : 0.7279         
+                                         
+       'Positive' Class : detection      
+                                         </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -335,16 +354,16 @@ Prediction      detection non_detection
 <pre><code># A tibble: 684 × 3
    .pred_detection .pred_non_detection occupancy
              &lt;dbl&gt;               &lt;dbl&gt; &lt;fct&gt;    
- 1           0.814               0.186 detection
- 2           0.806               0.194 detection
- 3           0.792               0.208 detection
- 4           0.784               0.216 detection
- 5           0.776               0.224 detection
- 6           0.872               0.128 detection
- 7           0.870               0.130 detection
- 8           0.865               0.135 detection
- 9           0.861               0.139 detection
-10           0.857               0.143 detection
+ 1           0.927              0.0727 detection
+ 2           0.924              0.0764 detection
+ 3           0.919              0.0810 detection
+ 4           0.915              0.0847 detection
+ 5           0.912              0.0884 detection
+ 6           0.955              0.0452 detection
+ 7           0.954              0.0464 detection
+ 8           0.952              0.0483 detection
+ 9           0.950              0.0497 detection
+10           0.948              0.0517 detection
 # ℹ 674 more rows</code></pre>
 </div>
 </div>
@@ -363,7 +382,7 @@ Prediction      detection non_detection
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 roc_auc binary         0.885</code></pre>
+1 roc_auc binary         0.899</code></pre>
 </div>
 </div>
 </section>
@@ -392,29 +411,29 @@ Prediction      detection non_detection
 
                Reference
 Prediction      detection non_detection
-  detection           421            69
-  non_detection        24           170
-                                         
-               Accuracy : 0.864          
-                 95% CI : (0.836, 0.8888)
-    No Information Rate : 0.6506         
-    P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
-                                         
-                  Kappa : 0.6873         
-                                         
- Mcnemar's Test P-Value : 5.053e-06      
-                                         
-            Sensitivity : 0.9461         
-            Specificity : 0.7113         
-         Pos Pred Value : 0.8592         
-         Neg Pred Value : 0.8763         
-             Prevalence : 0.6506         
-         Detection Rate : 0.6155         
-   Detection Prevalence : 0.7164         
-      Balanced Accuracy : 0.8287         
-                                         
-       'Positive' Class : detection      
-                                         </code></pre>
+  detection           435            90
+  non_detection        10           149
+                                          
+               Accuracy : 0.8538          
+                 95% CI : (0.8251, 0.8794)
+    No Information Rate : 0.6506          
+    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+                                          
+                  Kappa : 0.6514          
+                                          
+ Mcnemar's Test P-Value : 2.789e-15       
+                                          
+            Sensitivity : 0.9775          
+            Specificity : 0.6234          
+         Pos Pred Value : 0.8286          
+         Neg Pred Value : 0.9371          
+             Prevalence : 0.6506          
+         Detection Rate : 0.6360          
+   Detection Prevalence : 0.7675          
+      Balanced Accuracy : 0.8005          
+                                          
+       'Positive' Class : detection       
+                                          </code></pre>
 </div>
 </div>
 </section>
@@ -443,26 +462,26 @@ Prediction      detection non_detection
 
                Reference
 Prediction      detection non_detection
-  detection           425            70
-  non_detection        20           169
+  detection           443           201
+  non_detection         2            38
                                           
-               Accuracy : 0.8684          
-                 95% CI : (0.8408, 0.8929)
+               Accuracy : 0.7032          
+                 95% CI : (0.6674, 0.7372)
     No Information Rate : 0.6506          
-    P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+    P-Value [Acc &gt; NIR] : 0.001994        
                                           
-                  Kappa : 0.6959          
+                  Kappa : 0.1914          
                                           
- Mcnemar's Test P-Value : 2.404e-07       
+ Mcnemar's Test P-Value : &lt; 2.2e-16       
                                           
-            Sensitivity : 0.9551          
-            Specificity : 0.7071          
-         Pos Pred Value : 0.8586          
-         Neg Pred Value : 0.8942          
+            Sensitivity : 0.9955          
+            Specificity : 0.1590          
+         Pos Pred Value : 0.6879          
+         Neg Pred Value : 0.9500          
              Prevalence : 0.6506          
-         Detection Rate : 0.6213          
-   Detection Prevalence : 0.7237          
-      Balanced Accuracy : 0.8311          
+         Detection Rate : 0.6477          
+   Detection Prevalence : 0.9415          
+      Balanced Accuracy : 0.5773          
                                           
        'Positive' Class : detection       
                                           </code></pre>
@@ -531,29 +550,29 @@ Prediction      detection non_detection
 
                Reference
 Prediction      detection non_detection
-  detection           430            89
-  non_detection        15           150
-                                         
-               Accuracy : 0.848          
-                 95% CI : (0.8188, 0.874)
-    No Information Rate : 0.6506         
-    P-Value [Acc &gt; NIR] : &lt; 2.2e-16      
-                                         
-                  Kappa : 0.6398         
-                                         
- Mcnemar's Test P-Value : 8.172e-13      
-                                         
-            Sensitivity : 0.9663         
-            Specificity : 0.6276         
-         Pos Pred Value : 0.8285         
-         Neg Pred Value : 0.9091         
-             Prevalence : 0.6506         
-         Detection Rate : 0.6287         
-   Detection Prevalence : 0.7588         
-      Balanced Accuracy : 0.7970         
-                                         
-       'Positive' Class : detection      
-                                         </code></pre>
+  detection           441           154
+  non_detection         4            85
+                                          
+               Accuracy : 0.769           
+                 95% CI : (0.7356, 0.8001)
+    No Information Rate : 0.6506          
+    P-Value [Acc &gt; NIR] : 1.276e-11       
+                                          
+                  Kappa : 0.4056          
+                                          
+ Mcnemar's Test P-Value : &lt; 2.2e-16       
+                                          
+            Sensitivity : 0.9910          
+            Specificity : 0.3556          
+         Pos Pred Value : 0.7412          
+         Neg Pred Value : 0.9551          
+             Prevalence : 0.6506          
+         Detection Rate : 0.6447          
+   Detection Prevalence : 0.8699          
+      Balanced Accuracy : 0.6733          
+                                          
+       'Positive' Class : detection       
+                                          </code></pre>
 </div>
 </div>
 </section>
@@ -577,24 +596,24 @@ Number of resamples: 5
 
 ROC 
                    Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
-random_forest 0.9807164 0.9832597 0.9851331 0.9858703 0.9868192 0.9934230    0
-xgb           0.9788900 0.9825104 0.9838686 0.9837989 0.9866988 0.9870266    0
-svm           0.9207815 0.9389803 0.9408136 0.9408004 0.9465952 0.9568313    0
-ridge         0.9166600 0.9250653 0.9256256 0.9296324 0.9395022 0.9413087    0
+random_forest 0.9851090 0.9876422 0.9901914 0.9897048 0.9906865 0.9948950    0
+xgb           0.9798876 0.9850157 0.9870199 0.9872293 0.9919979 0.9922253    0
+svm           0.9194433 0.9435033 0.9499547 0.9436320 0.9521879 0.9530711    0
+ridge         0.9296646 0.9301753 0.9319417 0.9353642 0.9352067 0.9498327    0
 
 Sens 
                    Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
-random_forest 0.9361702 0.9539007 0.9716312 0.9617021 0.9716312 0.9751773    0
-xgb           0.9361702 0.9397163 0.9432624 0.9560284 0.9716312 0.9893617    0
-svm           0.9751773 0.9822695 0.9822695 0.9815603 0.9822695 0.9858156    0
-ridge         0.9326241 0.9503546 0.9503546 0.9567376 0.9609929 0.9893617    0
+random_forest 0.9609929 0.9680851 0.9751773 0.9723404 0.9751773 0.9822695    0
+xgb           0.9361702 0.9468085 0.9680851 0.9609929 0.9716312 0.9822695    0
+svm           0.9751773 0.9787234 0.9787234 0.9815603 0.9858156 0.9893617    0
+ridge         0.9361702 0.9432624 0.9503546 0.9517730 0.9645390 0.9645390    0
 
 Spec 
                    Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
-random_forest 0.8947368 0.9169811 0.9245283 0.9238530 0.9396226 0.9433962    0
-xgb           0.9169811 0.9320755 0.9358491 0.9328756 0.9396226 0.9398496    0
-svm           0.6830189 0.7207547 0.7358491 0.7284806 0.7396226 0.7631579    0
-ridge         0.7471698 0.7773585 0.7781955 0.7850731 0.7849057 0.8377358    0</code></pre>
+random_forest 0.9172932 0.9396226 0.9433962 0.9442134 0.9509434 0.9698113    0
+xgb           0.9283019 0.9473684 0.9547170 0.9540020 0.9698113 0.9698113    0
+svm           0.6867925 0.7245283 0.7283019 0.7284835 0.7433962 0.7593985    0
+ridge         0.7773585 0.7924528 0.7962264 0.7978806 0.8082707 0.8150943    0</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -846,12 +865,12 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
       <a href="./feature_engineering.html" class="pagination-link">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature_Engineering</span></span>
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature Engineering</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="./evaluation.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Evaluation</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tuning &amp; Evaluation</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>

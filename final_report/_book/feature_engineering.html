@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>재실감지 프로젝트 보고서 - 3&nbsp; Feature_Engineering</title>
+<title>재실감지 프로젝트 보고서 - 3&nbsp; Feature Engineering</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -108,7 +108,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./feature_engineering.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature_Engineering</span></a></li></ol></nav>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./feature_engineering.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature Engineering</span></a></li></ol></nav>
       <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
       </a>
       <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
@@ -154,7 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./feature_engineering.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature_Engineering</span></span></a>
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature Engineering</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
@@ -166,13 +166,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./evaluation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Evaluation</span></span></a>
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Tuning &amp; Evaluation</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modeling_python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Modeling - Python</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluation_python.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Tuning &amp; Evaluation - Python</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./report.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Conclusion</span></span></a>
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Conclusion</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demonstration.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Demonstration</span></span></a>
   </div>
 </li>
     </ul>
@@ -186,7 +204,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#eda-후-저장된-데이터-로드" id="toc-eda-후-저장된-데이터-로드" class="nav-link active" data-scroll-target="#eda-후-저장된-데이터-로드"><span class="header-section-number">3.1</span> EDA 후 저장된 데이터 로드</a></li>
-  <li><a href="#traintest-셋-분리" id="toc-traintest-셋-분리" class="nav-link" data-scroll-target="#traintest-셋-분리"><span class="header-section-number">3.2</span> Train/Test 셋 분리</a></li>
+  <li><a href="#feature-engineering" id="toc-feature-engineering" class="nav-link" data-scroll-target="#feature-engineering"><span class="header-section-number">3.2</span> Feature Engineering</a>
+  <ul class="collapse">
+  <li><a href="#불쾌-지수" id="toc-불쾌-지수" class="nav-link" data-scroll-target="#불쾌-지수"><span class="header-section-number">3.2.1</span> 불쾌 지수</a></li>
+  <li><a href="#이동표준편차" id="toc-이동표준편차" class="nav-link" data-scroll-target="#이동표준편차"><span class="header-section-number">3.2.2</span> 이동표준편차</a></li>
+  <li><a href="#interaction" id="toc-interaction" class="nav-link" data-scroll-target="#interaction"><span class="header-section-number">3.2.3</span> Interaction</a></li>
+  <li><a href="#lag" id="toc-lag" class="nav-link" data-scroll-target="#lag"><span class="header-section-number">3.2.4</span> Lag</a></li>
+  </ul></li>
+  <li><a href="#traintest-셋-분리" id="toc-traintest-셋-분리" class="nav-link" data-scroll-target="#traintest-셋-분리"><span class="header-section-number">3.3</span> Train/Test 셋 분리</a></li>
   </ul>
 </nav>
     </div>
@@ -195,7 +220,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature_Engineering</span></h1>
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Feature Engineering</span></h1>
 </div>
 
 
@@ -233,60 +258,227 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  $ hour       : int  8 8 8 8 8 8 8 8 8 8 ...
  $ minute     : int  0 1 2 3 4 5 6 7 8 9 ...</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> </span>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dat_m <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> </span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>X) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">timestamp=</span> <span class="fu">as.POSIXct</span>(timestamp)) <span class="sc">%&gt;%</span> </span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_if</span>(is.character, as.factor)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span> <span class="fu">str</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>'data.frame':   3420 obs. of  14 variables:
- $ timestamp  : POSIXct, format: "2023-05-25 08:00:00" "2023-05-25 08:01:00" ...
- $ co2        : int  560 590 590 590 590 590 625 625 625 625 ...
- $ temperature: num  23 23 23 23 23 ...
- $ humidity   : num  42.7 42.7 42.7 42.7 42.7 ...
- $ door       : int  54613010 54673025 54733026 54793030 54853005 54913014 54973018 55033025 55093088 55152999 ...
- $ motion     : int  22018948 22078965 22138954 22198955 22258939 22318954 22378947 22438965 22499015 22558943 ...
- $ fp2        : Factor w/ 2 levels "detection","non_detection": 2 2 2 2 2 2 2 2 2 2 ...
- $ occupancy  : Factor w/ 2 levels "detection","non_detection": 2 2 2 2 2 2 2 2 2 2 ...
- $ year       : int  2023 2023 2023 2023 2023 2023 2023 2023 2023 2023 ...
- $ month      : int  5 5 5 5 5 5 5 5 5 5 ...
- $ day        : int  25 25 25 25 25 25 25 25 25 25 ...
- $ weekday    : Factor w/ 4 levels "Monday","Thursday",..: 2 2 2 2 2 2 2 2 2 2 ...
- $ hour       : int  8 8 8 8 8 8 8 8 8 8 ...
- $ minute     : int  0 1 2 3 4 5 6 7 8 9 ...</code></pre>
-</div>
-</div>
-</section>
-<section id="traintest-셋-분리" class="level2" data-number="3.2">
-<h2 data-number="3.2" class="anchored" data-anchor-id="traintest-셋-분리"><span class="header-section-number">3.2</span> Train/Test 셋 분리</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(timestamp,year,month,day,minute))</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>splits <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()<span class="sc">*</span><span class="fl">0.8</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> dat[<span class="dv">1</span><span class="sc">:</span>splits,]</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> dat[(splits<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(dat <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()),]</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>train <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>dat_m <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(timestamp,year,month,day,minute))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>splits <span class="ot">&lt;-</span> dat_m <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()<span class="sc">*</span><span class="fl">0.8</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> dat_m[<span class="dv">1</span><span class="sc">:</span>splits,]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> dat_m[(splits<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(dat_m <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()),]</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>train <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2736</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>test <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>test <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 684</code></pre>
 </div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dat<span class="sc">%&gt;%</span> <span class="fu">is.na</span>() <span class="sc">%&gt;%</span> <span class="fu">colSums</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>dat_m<span class="sc">%&gt;%</span> <span class="fu">is.na</span>() <span class="sc">%&gt;%</span> <span class="fu">colSums</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        co2 temperature    humidity        door      motion         fp2 
+<pre><code>          X         co2 temperature    humidity        door      motion 
           0           0           0           0           0           0 
-  occupancy     weekday        hour 
-          0           0           0 </code></pre>
+        fp2   occupancy     weekday        hour 
+          0           0           0           0 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(train,<span class="st">"train.csv"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(test,<span class="st">"test.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="feature-engineering" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="feature-engineering"><span class="header-section-number">3.2</span> Feature Engineering</h2>
+<section id="불쾌-지수" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="불쾌-지수"><span class="header-section-number">3.2.1</span> 불쾌 지수</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># discrete value only with two arguements</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>f_discomfort <span class="ot">&lt;-</span> <span class="cf">function</span>(x1,x2) {</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  temperature <span class="ot">&lt;-</span> x1</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  humidity <span class="ot">&lt;-</span> x2</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  discomfort <span class="ot">&lt;-</span> <span class="fl">1.8</span><span class="sc">*</span>temperature <span class="sc">-</span> <span class="fl">0.55</span><span class="sc">*</span>(<span class="dv">1</span> <span class="sc">-</span> humidity<span class="sc">/</span><span class="dv">100</span>)<span class="sc">*</span>(<span class="fl">1.8</span><span class="sc">*</span>temperature <span class="sc">-</span> <span class="dv">26</span>) <span class="sc">+</span> <span class="dv">32</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  result <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  discomfort <span class="sc">&gt;=</span> <span class="dv">83</span> <span class="sc">~</span> <span class="fu">as.integer</span>(<span class="dv">12</span>),</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  discomfort <span class="sc">&gt;=</span> <span class="dv">80</span> <span class="sc">&amp;</span> discomfort <span class="sc">&lt;</span> <span class="dv">83</span> <span class="sc">~</span> <span class="fu">as.integer</span>(<span class="dv">10</span>),</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  discomfort <span class="sc">&gt;=</span> <span class="dv">75</span> <span class="sc">&amp;</span> discomfort <span class="sc">&lt;</span> <span class="dv">80</span> <span class="sc">~</span> <span class="fu">as.integer</span>(<span class="dv">8</span>),</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  discomfort <span class="sc">&gt;=</span> <span class="dv">70</span> <span class="sc">&amp;</span> discomfort <span class="sc">&lt;</span> <span class="dv">75</span> <span class="sc">~</span> <span class="fu">as.integer</span>(<span class="dv">6</span>),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  discomfort <span class="sc">&gt;=</span> <span class="dv">68</span> <span class="sc">&amp;</span> discomfort <span class="sc">&lt;</span> <span class="dv">70</span> <span class="sc">~</span> <span class="fu">as.integer</span>(<span class="dv">4</span>),</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="cn">TRUE</span> <span class="sc">~</span> <span class="fu">as.integer</span>(<span class="dv">2</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span> (result)</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> dat</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>dat1<span class="sc">$</span>discomfort_index <span class="ot">&lt;-</span> <span class="fu">with</span>(dat1,<span class="fu">f_discomfort</span>(temperature,humidity))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#dat&lt;- adply(dat,1,s_discomfort)</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#dat &lt;- adply(dat,1,two_discomfort)</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>dat1 <span class="sc">|&gt;</span> <span class="fu">str</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   3420 obs. of  16 variables:
+ $ X               : int  1 2 3 4 5 6 7 8 9 10 ...
+ $ timestamp       : chr  "2023-05-25 08:00:00" "2023-05-25 08:01:00" "2023-05-25 08:02:00" "2023-05-25 08:03:00" ...
+ $ co2             : int  560 590 590 590 590 590 625 625 625 625 ...
+ $ temperature     : num  23 23 23 23 23 ...
+ $ humidity        : num  42.7 42.7 42.7 42.7 42.7 ...
+ $ door            : int  54613010 54673025 54733026 54793030 54853005 54913014 54973018 55033025 55093088 55152999 ...
+ $ motion          : int  22018948 22078965 22138954 22198955 22258939 22318954 22378947 22438965 22499015 22558943 ...
+ $ fp2             : chr  "non_detection" "non_detection" "non_detection" "non_detection" ...
+ $ occupancy       : chr  "non_detection" "non_detection" "non_detection" "non_detection" ...
+ $ year            : int  2023 2023 2023 2023 2023 2023 2023 2023 2023 2023 ...
+ $ month           : int  5 5 5 5 5 5 5 5 5 5 ...
+ $ day             : int  25 25 25 25 25 25 25 25 25 25 ...
+ $ weekday         : chr  "Thursday" "Thursday" "Thursday" "Thursday" ...
+ $ hour            : int  8 8 8 8 8 8 8 8 8 8 ...
+ $ minute          : int  0 1 2 3 4 5 6 7 8 9 ...
+ $ discomfort_index: int  4 4 4 4 4 4 4 4 4 4 ...</code></pre>
+</div>
+</div>
+</section>
+<section id="이동표준편차" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="이동표준편차"><span class="header-section-number">3.2.2</span> 이동표준편차</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>window_size <span class="ot">&lt;-</span> <span class="dv">5</span>  <span class="co"># Adjust the window size as per your preference</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>rolling_features <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'co2'</span>, <span class="st">'temperature'</span>, <span class="st">'humidity'</span>, <span class="st">'motion'</span>, <span class="st">'door'</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Group by 'day' and apply rolling sd</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> dat1 <span class="sc">%&gt;%</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(day) <span class="sc">%&gt;%</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(rolling_features, <span class="sc">~</span>zoo<span class="sc">::</span><span class="fu">rollapply</span>(.x, window_size, sd, <span class="at">fill =</span> <span class="cn">NA</span>, <span class="at">align =</span> <span class="st">"right"</span>), <span class="at">.names =</span> <span class="st">"{.col}_rolling_std"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="interaction" class="level3" data-number="3.2.3">
+<h3 data-number="3.2.3" class="anchored" data-anchor-id="interaction"><span class="header-section-number">3.2.3</span> Interaction</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create interaction features within each day group</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>interaction_features <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">'co2'</span>, <span class="st">'temperature'</span>), <span class="fu">c</span>(<span class="st">'co2'</span>, <span class="st">'humidity'</span>))</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> dat1 <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(day) <span class="sc">%&gt;%</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(interaction_features, <span class="sc">~</span>.x[[<span class="dv">1</span>]] <span class="sc">*</span> (.x[[<span class="dv">2</span>]]<span class="sc">/</span><span class="dv">10</span>), <span class="at">.names =</span> <span class="st">"{interaction[[1]]}_{interaction[[2]]}_interaction"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="lag" class="level3" data-number="3.2.4">
+<h3 data-number="3.2.4" class="anchored" data-anchor-id="lag"><span class="header-section-number">3.2.4</span> Lag</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create lagged features within each day group</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>lagged_features <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'co2'</span>, <span class="st">'temperature'</span>, <span class="st">'humidity'</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>lag_steps <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>)  <span class="co"># Adjust the lag steps as per your preference</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> dat1 <span class="sc">%&gt;%</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(day) <span class="sc">%&gt;%</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(lagged_features, <span class="sc">~</span><span class="fu">lag</span>(.x, lag_steps))) <span class="sc">|&gt;</span> </span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="do">### Final Dataset </span><span class="al">###</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> dat1[<span class="fu">complete.cases</span>(dat1),]</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dat1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [3,415 × 38] (S3: tbl_df/tbl/data.frame)
+ $ X                          : int [1:3415] 6 7 8 9 10 11 12 13 14 15 ...
+ $ timestamp                  : chr [1:3415] "2023-05-25 08:05:00" "2023-05-25 08:06:00" "2023-05-25 08:07:00" "2023-05-25 08:08:00" ...
+ $ co2                        : int [1:3415] 590 625 625 625 625 625 660 660 660 660 ...
+ $ temperature                : num [1:3415] 23 23 23 23 23 ...
+ $ humidity                   : num [1:3415] 42.7 42.7 42.7 42.7 42.7 ...
+ $ door                       : int [1:3415] 54913014 54973018 55033025 55093088 55152999 55213015 55273015 55333000 55393186 55453016 ...
+ $ motion                     : int [1:3415] 22318954 22378947 22438965 22499015 22558943 22618949 22678940 22738938 22799121 22858949 ...
+ $ fp2                        : chr [1:3415] "non_detection" "non_detection" "non_detection" "non_detection" ...
+ $ occupancy                  : chr [1:3415] "non_detection" "non_detection" "non_detection" "non_detection" ...
+ $ year                       : int [1:3415] 2023 2023 2023 2023 2023 2023 2023 2023 2023 2023 ...
+ $ month                      : int [1:3415] 5 5 5 5 5 5 5 5 5 5 ...
+ $ day                        : int [1:3415] 25 25 25 25 25 25 25 25 25 25 ...
+ $ weekday                    : chr [1:3415] "Thursday" "Thursday" "Thursday" "Thursday" ...
+ $ hour                       : int [1:3415] 8 8 8 8 8 8 8 8 8 8 ...
+ $ minute                     : int [1:3415] 5 6 7 8 9 10 11 12 13 14 ...
+ $ discomfort_index           : int [1:3415] 4 4 4 4 4 4 4 4 4 4 ...
+ $ co2_rolling_std            : num [1:3415] 590 597 604 611 618 625 632 639 646 653 ...
+ $ temperature_rolling_std    : num [1:3415] 23 23 23 23 23 ...
+ $ humidity_rolling_std       : num [1:3415] 42.7 42.7 42.7 42.7 42.7 ...
+ $ motion_rolling_std         : num [1:3415] 22198953 22258950 22318952 22378964 22438965 ...
+ $ door_rolling_std           : num [1:3415] 54793020 54853019 54913018 54973030 55033029 ...
+ $ co2_temperature_interaction: num [1:3415] 1355 1436 1436 1436 1436 ...
+ $ co2_humidity_interaction   : num [1:3415] 2520 2669 2669 2669 2669 ...
+ $ co2_lag1                   : int [1:3415] 590 590 625 625 625 625 625 660 660 660 ...
+ $ co2_lag2                   : int [1:3415] 590 590 590 625 625 625 625 625 660 660 ...
+ $ co2_lag3                   : int [1:3415] 590 590 590 590 625 625 625 625 625 660 ...
+ $ co2_lag4                   : int [1:3415] 590 590 590 590 590 625 625 625 625 625 ...
+ $ co2_lag5                   : int [1:3415] 560 590 590 590 590 590 625 625 625 625 ...
+ $ temperature_lag1           : num [1:3415] 23 23 23 23 23 ...
+ $ temperature_lag2           : num [1:3415] 23 23 23 23 23 ...
+ $ temperature_lag3           : num [1:3415] 23 23 23 23 23 ...
+ $ temperature_lag4           : num [1:3415] 23 23 23 23 23 ...
+ $ temperature_lag5           : num [1:3415] 23 23 23 23 23 ...
+ $ humidity_lag1              : num [1:3415] 42.7 42.7 42.7 42.7 42.7 ...
+ $ humidity_lag2              : num [1:3415] 42.7 42.7 42.7 42.7 42.7 ...
+ $ humidity_lag3              : num [1:3415] 42.7 42.7 42.7 42.7 42.7 ...
+ $ humidity_lag4              : num [1:3415] 42.7 42.7 42.7 42.7 42.7 ...
+ $ humidity_lag5              : num [1:3415] 42.7 42.7 42.7 42.7 42.7 ...</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="traintest-셋-분리" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="traintest-셋-분리"><span class="header-section-number">3.3</span> Train/Test 셋 분리</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dat1 <span class="ot">&lt;-</span> dat1 <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(timestamp,year,month,day,minute))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>splits <span class="ot">&lt;-</span> dat1 <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()<span class="sc">*</span><span class="fl">0.8</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>train_1 <span class="ot">&lt;-</span> dat1[<span class="dv">1</span><span class="sc">:</span>splits,]</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>test_1 <span class="ot">&lt;-</span> dat1[(splits<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span>(dat1 <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()),]</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>train_1 <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2732</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>test_1 <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 683</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(train,<span class="st">"train.csv"</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(test,<span class="st">"test.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>dat1 <span class="sc">|&gt;</span> <span class="fu">is.na</span>() <span class="sc">|&gt;</span> <span class="fu">colSums</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                          X                         co2 
+                          0                           0 
+                temperature                    humidity 
+                          0                           0 
+                       door                      motion 
+                          0                           0 
+                        fp2                   occupancy 
+                          0                           0 
+                    weekday                        hour 
+                          0                           0 
+           discomfort_index             co2_rolling_std 
+                          0                           0 
+    temperature_rolling_std        humidity_rolling_std 
+                          0                           0 
+         motion_rolling_std            door_rolling_std 
+                          0                           0 
+co2_temperature_interaction    co2_humidity_interaction 
+                          0                           0 
+                   co2_lag1                    co2_lag2 
+                          0                           0 
+                   co2_lag3                    co2_lag4 
+                          0                           0 
+                   co2_lag5            temperature_lag1 
+                          0                           0 
+           temperature_lag2            temperature_lag3 
+                          0                           0 
+           temperature_lag4            temperature_lag5 
+                          0                           0 
+              humidity_lag1               humidity_lag2 
+                          0                           0 
+              humidity_lag3               humidity_lag4 
+                          0                           0 
+              humidity_lag5 
+                          0 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(train_1,<span class="st">"train_1.csv"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(test_1,<span class="st">"test_1.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
