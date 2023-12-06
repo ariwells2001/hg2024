@@ -24,11 +24,11 @@ train <- read.csv("train.csv")
 test <- read.csv("test.csv")
 
 train <- train %>% 
-  select(-X,-weekday) %>% 
+  select(-X,-X.1,-weekday) %>% 
   mutate_if(is.character,as.factor)
 
 test <- test %>% 
-  select(-X,-weekday) %>% 
+  select(-X,-X.1,-weekday) %>% 
   mutate_if(is.character,as.factor)
 ```
 
@@ -44,13 +44,14 @@ rec <- train %>%
 ### Random Forest
 
 ```{r}
+set.seed(123)
 control <- trainControl(method='cv',
                         number=5,
                         classProbs=T,
                         summaryFunction = twoClassSummary,
                         savePredictions="all")
 
-tunegrid <- expand.grid(mtry = c(1:5))
+tunegrid <- expand.grid(mtry = c(2, 3, 4, 5))
 
 rf_gridsearch <- train(rec,train,
                        method='rf',
@@ -64,12 +65,6 @@ rf_gridsearch <- train(rec,train,
 ```{r}
 pred <- predict(rf_gridsearch,newdata=test)
 confusionMatrix(pred,test$occupancy)
-```
-
-### Feature Importance
-
-```{r}
-plot(varImp(rf_gridsearch,scale=F))
 ```
 
 ### ROC
@@ -89,4 +84,45 @@ plot(roc_result,
      print.thres ="best",
      print.auc = TRUE,
      legacy.axes = T)
+```
+
+```{r}
+rf_gridsearch
+
+```
+
+## 최종 모델링 (with all train datasets)
+
+Hyperparameters: mtry = 2
+
+```{r}
+control_final <- trainControl(method='none',classProbs = TRUE)
+
+tunegrid_final <- data.frame(mtry=2)
+
+rf_final <- train(rec,train,
+                       method='rf',
+                       trControl = control_final,
+                       tuneGrid= tunegrid_final,
+                       metric ="ROC")
+
+pred <- predict(rf_final,newdata=test)
+confusionMatrix(pred,test$occupancy)
+
+pred_prob <- predict(rf_final,newdata=test,type="prob")[,1]
+roc_result <- roc(response=test$occupancy,
+                  predictor=pred_prob,
+                  levels =rev(levels(test$occupancy)))
+
+par(pty="s")
+plot(roc_result,
+     print.thres ="best",
+     print.auc = TRUE,
+     legacy.axes = T)
+```
+
+## (참고) Features Importance
+
+```{r}
+plot(varImp(rf_final,scale=F))
 ```

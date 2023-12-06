@@ -1,3 +1,349 @@
 ---
 title: "Conclusion"
 ---
+
+```{r include=F}
+knitr::opts_chunk$set(warning=F,message=F)
+
+library(tidyverse)
+library(tidymodels)
+library(rsample)
+library(caret)
+library(GGally)
+library(janitor)
+library(data.table)
+library(DataExplorer)
+library(skimr)
+library(pROC)
+```
+
+## Exploratory Data Analysis
+
+```{r}
+eda <- read.csv("eda.csv")
+eda |> glimpse()
+```
+
+### Occupancy유무와 Features들과의 관계
+
+환경 센서(co2,temperature,humidity)의 값은 detection(재실)의 경우가 non-detection에 비해 높은값으로 분포되어 있다.
+
+```{r}
+plot_boxplot(eda[c("co2","temperature","humidity","occupancy")],by = "occupancy",ncol=3)
+```
+
+### FP2 유무와 Features 들과의 관계
+
+FP2센서의 경우도 Occupancy유무와 비슷한 경향을 보였다. 즉, 환경 센서(co2,temperature,humidity)의 값은 detection(재실)의 경우가 non-detection에 비해 높은값으로 분포되어 있다.
+
+```{r}
+plot_boxplot(eda[c("co2","temperature","humidity","fp2")],by = "fp2",ncol=3)
+```
+
+### Occupancy와 FP2/weekday 관계
+
+fp2의 경우 detection경우보다 non-detection경우가 정분류율이 훨씬 높았다.
+
+즉, 특이도(specificity/true negative rate) \> 재현율(sensitivity/true positive rate)
+
+```{r}
+plot_bar(eda[c("fp2","weekday","occupancy")],by="occupancy",ncol=2)
+```
+
+## Statistics
+
+### Occupancy 유무에 따라 co2 평균값에 차이가 있는 지 검정
+
+```{r}
+result <- t.test(co2 ~ occupancy,data=eda)
+result
+```
+
+결과: Occupancy 유무에 따라 CO2의 평균값에 유의한 차이를 보인다.
+
+### Occupancy 유무에 따라 Temperature 평균값에 차이가 있는 지 검정
+
+```{r}
+result <- t.test(temperature ~ occupancy,data=eda)
+result
+```
+
+결과: Occupancy 유무에 따라 Temperature의 평균값에 유의한 차이를 보인다.
+
+### Occupancy 유무에 따라 Humidity 평균값에 차이가 있는 지 검정
+
+```{r}
+result <- t.test(humidity ~ occupancy,data=eda)
+result
+```
+
+결과: Occupancy 유무에 따라 Humidity의 평균값에 유의한 차이를 보인다.
+
+### Occupancy와 FP2 독립성 검정
+
+```{r}
+ct <- with(eda,table(fp2,occupancy))
+result <- chisq.test(ct)
+result
+```
+
+결과: Occupancy와 FP2는 상호 관련이 있다.
+
+## Feature Engineering
+
+불쾌지수, 이동표준편차, Interaction, Lag라는 4개의 파생변수를 생성했다.
+
+```{r include=F}
+knitr::opts_chunk$set(message=F,warning=F)
+library(data.table)
+library(tidyverse)
+library(tidymodels)
+library(rsample)
+library(plyr)
+```
+
+```{r}
+dat <- read.csv("eda.csv")
+```
+
+### 불쾌지수
+
+```{r}
+# discrete value only with two arguements
+
+f_discomfort <- function(x1,x2) {
+  temperature <- x1
+  humidity <- x2
+  discomfort <- 1.8*temperature - 0.55*(1 - humidity/100)*(1.8*temperature - 26) + 32
+  
+  result <- case_when(
+  discomfort >= 83 ~ as.integer(12),
+  discomfort >= 80 & discomfort < 83 ~ as.integer(10),
+  discomfort >= 75 & discomfort < 80 ~ as.integer(8),
+  discomfort >= 70 & discomfort < 75 ~ as.integer(6),
+  discomfort >= 68 & discomfort < 70 ~ as.integer(4),
+  TRUE ~ as.integer(2)
+  )
+  return (result)
+}
+
+dat1 <- dat
+dat1$discomfort_index <- with(dat1,f_discomfort(temperature,humidity))
+```
+
+### 이동표준편차
+
+```{r}
+window_size <- 5  # Adjust the window size as per your preference
+rolling_features <- c('co2', 'temperature', 'humidity', 'motion', 'door')
+
+# Group by 'day' and apply rolling sd
+dat1 <- dat1 %>%
+  group_by(day) %>%
+  mutate(across(rolling_features, ~zoo::rollapply(.x, window_size, sd, fill = NA, align = "right"), .names = "{.col}_rolling_std")) |> 
+  ungroup() 
+```
+
+### Interaction
+
+```{r}
+# Create interaction features within each day group
+interaction_features <- list(c('co2', 'temperature'), c('co2', 'humidity'))
+dat1 <- dat1 %>%
+  group_by(day) %>%
+  mutate(across(interaction_features, ~.x[[1]] * (.x[[2]]/10), .names = "{interaction[[1]]}_{interaction[[2]]}_interaction")) |> 
+  ungroup() 
+```
+
+### Lag
+
+```{r}
+# Create lagged features within each day group
+lagged_features <- c('co2', 'temperature', 'humidity')
+lag_steps <- c(1, 2, 3, 4, 5)  # Adjust the lag steps as per your preference
+
+dat1 <- dat1 %>%
+  group_by(day) %>%
+  mutate(across(lagged_features, ~lag(.x, lag_steps))) |> 
+  ungroup()
+```
+
+### Final Datasets
+
+```{r}
+### Final Dataset ###
+dat1 <- dat1[complete.cases(dat1),]
+str(dat1)
+```
+
+## Modeling
+
+```{r include=F}
+knitr::opts_chunk$set(warning=F,message=F)
+
+library(data.table)
+library(tidyverse)
+library(tidymodels)
+library(rsample)
+library(xgboost)
+library(caret)
+
+train <- read.csv("train.csv")
+test <- read.csv("test.csv")
+
+train <- train %>% 
+  select(-X,-weekday) %>% 
+  mutate_if(is.character,as.factor)
+
+test <- test %>% 
+  select(-X,-weekday) %>% 
+  mutate_if(is.character,as.factor)
+
+rec <- train %>% 
+  recipe(occupancy ~.) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_dummy(all_factor_predictors())
+
+
+control <- trainControl(method='cv',
+                        number=5,
+                        classProbs=T,
+                        summaryFunction = twoClassSummary,
+                        savePredictions="all")
+
+tunegrid <- expand.grid(mtry = c(1:5))
+
+rf_gridsearch <- train(rec,train,
+                       method='rf',
+                       trControl = control,
+                       tuneGrid = tunegrid,
+                       metric ="ROC")
+
+xgb_gridsearch <- train(rec,train,
+                       method='xgbTree',
+                       trControl = control,
+                       tuneLength = 3,
+                       metric ="ROC",
+                       verbosity = 0)
+
+svm_gridsearch <- train(rec,train,
+                        method = "svmPoly",
+                        trControl = control,
+                        tuneLength = 2,
+                        metric="ROC")
+
+lambda <- seq(0,1,length=11)
+ridge_grid <- expand.grid(alpha=0,lambda=lambda)
+ridge_gridsearch <- train(rec,train,
+                       method="glmnet",
+                       trControl = control,
+                       tuneGrid = ridge_grid,
+                       metric = "ROC")
+
+
+```
+
+Random Forest, XGBOOST, Support Vector Machine, Ridge Classification를 이용하여 재실여부 관련 모델링을 진행했다.
+
+```{r}
+resamps <- resamples(list(
+                          random_forest = rf_gridsearch,
+                          xgb = xgb_gridsearch,
+                          svm = svm_gridsearch,
+                          ridge = ridge_gridsearch
+                          ))
+summary(resamps)
+```
+
+```{r}
+bwplot(resamps,metric="ROC")
+```
+
+결론: ROC를 metric으로 사용할 경우 Random Forest와 XGBOOST의 평가지표가 가장 우수하다. 다만, Random Forest로 모델링한 경우 상대적으로 분산이 작고 성능도 약간 우수한 편이므로 Random Forest를 최종 모델로 선택하는 것이 바람직하다.
+
+## Tuning & Evaluation
+
+Random Forest에는 다양한 hyperparameters(mtry,ntree,samsize등)가 존재한다. 본 실험에서는 mtry(각 트리에서 선택할 독립변수의 수)만을 사용했다.
+
+```{r include=F}
+knitr::opts_chunk$set(warning=F,message=F)
+
+library(data.table)
+library(tidyverse)
+library(tidymodels)
+library(rsample)
+library(xgboost)
+library(caret)
+
+train <- read.csv("train.csv")
+test <- read.csv("test.csv")
+
+train <- train %>% 
+  select(-X,-X.1,-weekday) %>% 
+  mutate_if(is.character,as.factor)
+
+test <- test %>% 
+  select(-X,-X.1,-weekday) %>% 
+  mutate_if(is.character,as.factor)
+
+rec <- train %>% 
+  recipe(occupancy ~.) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_dummy(all_factor_predictors())
+
+set.seed(123)
+control <- trainControl(method='cv',
+                        number=5,
+                        classProbs=T,
+                        summaryFunction = twoClassSummary,
+                        savePredictions="all")
+
+tunegrid <- expand.grid(mtry = c(2, 3, 4, 5))
+
+rf_gridsearch <- train(rec,train,
+                       method='rf',
+                       trControl = control,
+                       tuneGrid = tunegrid,
+                       metric ="ROC")
+
+```
+
+mtry이라는 hyperparameter tuning 결과는 다음과 같다.
+
+```{r}
+rf_gridsearch
+```
+
+mtry에 최적의 값 2를 적용한 후 전체 train dataset을 적합시켜 다음과 같은 결과를 얻었다.
+
+```{r}
+control_final <- trainControl(method='none',classProbs = TRUE)
+
+tunegrid_final <- data.frame(mtry=2)
+
+rf_final <- train(rec,train,
+                       method='rf',
+                       trControl = control_final,
+                       tuneGrid= tunegrid_final,
+                       metric ="ROC")
+
+pred <- predict(rf_final,newdata=test)
+confusionMatrix(pred,test$occupancy)
+
+pred_prob <- predict(rf_final,newdata=test,type="prob")[,1]
+roc_result <- roc(response=test$occupancy,
+                  predictor=pred_prob,
+                  levels =rev(levels(test$occupancy)))
+
+par(pty="s")
+plot(roc_result,
+     print.thres ="best",
+     print.auc = TRUE,
+     legacy.axes = T)
+```
+
+## 결론
+
+아카라 다중 센서(CO2,온습도센서,열림감지센서, 모션센서,FP2 센서)를 활용하여 재실유무 예측 모델을 만들었다. 학습할 데이터가 충분하지 못하고, 추가적인 최적화 과정이 필요한 관계로 평가지표가 상용화 할 수준에 크게 못 미쳤지만, 충분한 데이터를 확보하고, 추가 파생변수 생성 및 적절한 최적화 과정을 거치면, 저가의 다중센서를 활용하여 유의미한 재실 감지 유무를 예측하는 모델을 생성할 수 있는 가능성을 확인했다는 점에 본 실험의 의미를 두고자 한다.
+
+앞으로 연구해야 할 과제는 충분한 데이터 확보와 최적화 작업을 통한 모델의 고도화 작업이지만, 더 중요한 점은 FP2센서를 Ground Truth로 사용할 방법을 연구하여 사생활 이슈가 있는 카메라 영상을 대체하는 것이다. 이 점은 사업적 측면에서도 매우 의미있는 연구 주제가 될 수 있을 것으로 생각된다.
