@@ -215,8 +215,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#히스토그램" id="toc-히스토그램" class="nav-link" data-scroll-target="#히스토그램"><span class="header-section-number">1.2.2</span> 히스토그램</a></li>
   <li><a href="#occupancy유무에-따른-수치형-변수-박스플롯" id="toc-occupancy유무에-따른-수치형-변수-박스플롯" class="nav-link" data-scroll-target="#occupancy유무에-따른-수치형-변수-박스플롯"><span class="header-section-number">1.2.3</span> Occupancy유무에 따른 수치형 변수 박스플롯</a></li>
   <li><a href="#fp2-감지-유무에-따른-수치형-변수-박스플롯" id="toc-fp2-감지-유무에-따른-수치형-변수-박스플롯" class="nav-link" data-scroll-target="#fp2-감지-유무에-따른-수치형-변수-박스플롯"><span class="header-section-number">1.2.4</span> fp2 감지 유무에 따른 수치형 변수 박스플롯</a></li>
-  <li><a href="#occupancy-유무에-따른-범주형-변수-박스플롯" id="toc-occupancy-유무에-따른-범주형-변수-박스플롯" class="nav-link" data-scroll-target="#occupancy-유무에-따른-범주형-변수-박스플롯"><span class="header-section-number">1.2.5</span> Occupancy 유무에 따른 범주형 변수 박스플롯</a></li>
-  <li><a href="#요일별-수치형-변수-박스플롯---현재는-충분한-데이터가-없으므로-의미-없음" id="toc-요일별-수치형-변수-박스플롯---현재는-충분한-데이터가-없으므로-의미-없음" class="nav-link" data-scroll-target="#요일별-수치형-변수-박스플롯---현재는-충분한-데이터가-없으므로-의미-없음"><span class="header-section-number">1.2.6</span> 요일별 수치형 변수 박스플롯 - 현재는 충분한 데이터가 없으므로 의미 없음</a></li>
+  <li><a href="#occupancy-유무에-따른-범주형-변수-바-플롯" id="toc-occupancy-유무에-따른-범주형-변수-바-플롯" class="nav-link" data-scroll-target="#occupancy-유무에-따른-범주형-변수-바-플롯"><span class="header-section-number">1.2.5</span> Occupancy 유무에 따른 범주형 변수 바 플롯</a></li>
+  <li><a href="#요일별-수치형-변수-박스플롯" id="toc-요일별-수치형-변수-박스플롯" class="nav-link" data-scroll-target="#요일별-수치형-변수-박스플롯"><span class="header-section-number">1.2.6</span> 요일별 수치형 변수 박스플롯</a></li>
   <li><a href="#상관계수" id="toc-상관계수" class="nav-link" data-scroll-target="#상관계수"><span class="header-section-number">1.2.7</span> 상관계수</a></li>
   <li><a href="#occupancy-유무에-따른-pairs플롯-및-기타" id="toc-occupancy-유무에-따른-pairs플롯-및-기타" class="nav-link" data-scroll-target="#occupancy-유무에-따른-pairs플롯-및-기타"><span class="header-section-number">1.2.8</span> Occupancy 유무에 따른 pairs플롯 및 기타</a></li>
   </ul></li>
@@ -246,8 +246,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="raw-data-in-a-glance" class="level2" data-number="1.1">
 <h2 data-number="1.1" class="anchored" data-anchor-id="raw-data-in-a-glance"><span class="header-section-number">1.1</span> Raw Data in a Glance</h2>
+<p>본 실험의 목적은 아카라 다중 센서를 활용해서 재실 여부를 예측하는 모델을 개발하기 위함이다.</p>
+<p>그리고, 궁극적으로는 FP2센서를 재실여부를 확인하는 ground truth장치로 사용할 수 있는지 확인하는 동시에 그 방법을 모색하기 위함이다. 단, 실험 데이터의 부족으로 인해 이번 실험에서는 FP2센서를 재실 감지 예측을 위해 사용된 센서들 중의 하나의 역할만 담당한다.</p>
+<p>실험에서 사용된 아카라 센서는 CO2 센서, 온습도 센서, 열림감지 센서, 모션 센서, FP2 센서이다. 학습을 위한 재실여부의 Ground Truth 데이터는 아카라의 G2HPro 카메라로 찍은 영상을 Yolov5로 분류하여 확보하였다.</p>
+<p>열림감지 센서와 모션센서와 같은 바이너리 센서의 경우 이벤트 발생 여부를 활용하는 대신, 이벤트가 발생한 후 새로운 이벤트가 발생할 떼가지의 걸린 시간을 그 값으로 활용했다. 열림감지 센서의 경우 이진 데이터보다 시간 데이터를 사용했을 때 예측력이 더 기여했으며, 모센센서의 경우 이벤트를 감지한 경우만 저장되는 메카니즘으로 인해 이진값의 의미가 없기 때문에 이벤트 사이의 경과 시간을 그 파생변수로 활용하게 되었다.</p>
 <section id="데이터-로딩" class="level3" data-number="1.1.1">
 <h3 data-number="1.1.1" class="anchored" data-anchor-id="데이터-로딩"><span class="header-section-number">1.1.1</span> 데이터 로딩</h3>
+<p>5일간(월,화,수,목,일)의 데이터가 수집되었으며, 이중 4일간(월,화,수,목)의 데이터를 이용해서 모델링을 수행하였다.</p>
+<p>Occupancy은 Ground Truth로 G2HPro (+ Yolov5)로 부터 얻은 데이터이다. FP2 경우 이진데이터를 그대로 활용했다.</p>
+<p>FP2와 Occupancy는 모델링을 위해 factor형으로 변환하였다.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="ot">&lt;-</span> <span class="fu">fread</span>(<span class="st">"integrated_0526_0622.csv"</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>aqara <span class="ot">&lt;-</span> aqara <span class="sc">|&gt;</span>  </span>
@@ -258,6 +265,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="skimming-data" class="level3" data-number="1.1.2">
 <h3 data-number="1.1.2" class="anchored" data-anchor-id="skimming-data"><span class="header-section-number">1.1.2</span> Skimming Data</h3>
+<p>총 3900개의 데이터가 확보되었다.</p>
+<p>timestamp, co2, temperature, humidity,door, motion, fp2가 재실여부 예측을 위한 기본 features로 활용되며, occupancy가 target변수이다.</p>
+<p>timestamp: datetime feature</p>
+<p>temperature,humidity,door, motion: numeric features</p>
+<p>fp2: factor type binary feature</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span>  <span class="fu">str</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -499,6 +511,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="날짜시간-관련-파생변수-생성" class="level3" data-number="1.1.3">
 <h3 data-number="1.1.3" class="anchored" data-anchor-id="날짜시간-관련-파생변수-생성"><span class="header-section-number">1.1.3</span> 날짜/시간 관련 파생변수 생성</h3>
+<p>timestamp로 부터 year,month, day, weekday, hour, minute라는 파생 변수 생성했다. 다만, 데이터 제약인해 year, month, day, weekday, minute는 추후 모델링시 활용하지 않았다. weekday는 의미있는 파생변수가 될 수 있으나, 금/토의 데이터가 없는 관계로 이번 실험에서는 활용하지 않을 예정이다.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="ot">&lt;-</span> aqara <span class="sc">|&gt;</span>  </span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">year</span>(timestamp),</span>
@@ -528,131 +541,150 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 6: non_detection 2023     5  25 Thursday    8      5</code></pre>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(aqara<span class="sc">$</span>weekday)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+   Monday    Sunday  Thursday   Tuesday Wednesday 
+      960       480      1020       960       480 </code></pre>
+</div>
+</div>
 </section>
 </section>
 <section id="plot-analysis" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="plot-analysis"><span class="header-section-number">1.2</span> Plot Analysis</h2>
 <section id="박스플롯" class="level3" data-number="1.2.1">
 <h3 data-number="1.2.1" class="anchored" data-anchor-id="박스플롯"><span class="header-section-number">1.2.1</span> 박스플롯</h3>
+<p>환경 센서중 humidity경우는 이상치가 전혀 없었으나, co2는 상대적으로 큰 이상치가 발견되었으며, 온도의 경우 낮은 온도에서 상대적으로 많은 이상치가 기록되었다. co2 이상치의 경우 실험과정에서 센서 자체 테스트했을때 기록된 데이터로 추측된다.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span>  </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_if</span>(is.numeric) <span class="sc">|&gt;</span> </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>() <span class="sc">|&gt;</span>  </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>value,<span class="at">fill=</span>key)) <span class="sc">+</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>key,<span class="at">scale=</span><span class="st">'free'</span>)<span class="sc">+</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">'none'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="eda_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="히스토그램" class="level3" data-number="1.2.2">
-<h3 data-number="1.2.2" class="anchored" data-anchor-id="히스토그램"><span class="header-section-number">1.2.2</span> 히스토그램</h3>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span>  </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_if</span>(is.numeric) <span class="sc">|&gt;</span>  </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>()) <span class="sc">|&gt;</span>  </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>value,<span class="at">fill=</span>name)) <span class="sc">+</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>name,<span class="at">scale=</span><span class="st">'free'</span>) <span class="sc">+</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">'none'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span>  </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_if</span>(is.numeric) <span class="sc">|&gt;</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">gather</span>() <span class="sc">|&gt;</span>  </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>value,<span class="at">fill=</span>key)) <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>key,<span class="at">scale=</span><span class="st">'free'</span>)<span class="sc">+</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">'none'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="eda_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="occupancy유무에-따른-수치형-변수-박스플롯" class="level3" data-number="1.2.3">
-<h3 data-number="1.2.3" class="anchored" data-anchor-id="occupancy유무에-따른-수치형-변수-박스플롯"><span class="header-section-number">1.2.3</span> Occupancy유무에 따른 수치형 변수 박스플롯</h3>
+<section id="히스토그램" class="level3" data-number="1.2.2">
+<h3 data-number="1.2.2" class="anchored" data-anchor-id="히스토그램"><span class="header-section-number">1.2.2</span> 히스토그램</h3>
+<p>환경센서 중 co2 경우 정규분포의 형태를 일부 보이고 있으나, 상위값에 이상치가 보인다.</p>
+<p>반면에 temperature 경우 오른쪽으로 기울어진 분포를 보이고 하위값에 많은 이상치가 보인다. motion과 door센서의 경우 극단적으로 왼쪽으로 기울어진 (right skewed) 분포를 보이고 있다.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_boxplot</span>(aqara,<span class="at">by =</span> <span class="st">"occupancy"</span>,<span class="at">ncol=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span>  </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_if</span>(is.numeric) <span class="sc">|&gt;</span>  </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols=</span><span class="fu">everything</span>()) <span class="sc">|&gt;</span>  </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping=</span><span class="fu">aes</span>(<span class="at">x=</span>value,<span class="at">fill=</span>name)) <span class="sc">+</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>name,<span class="at">scale=</span><span class="st">'free'</span>) <span class="sc">+</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position=</span><span class="st">'none'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="eda_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="fp2-감지-유무에-따른-수치형-변수-박스플롯" class="level3" data-number="1.2.4">
-<h3 data-number="1.2.4" class="anchored" data-anchor-id="fp2-감지-유무에-따른-수치형-변수-박스플롯"><span class="header-section-number">1.2.4</span> fp2 감지 유무에 따른 수치형 변수 박스플롯</h3>
+<section id="occupancy유무에-따른-수치형-변수-박스플롯" class="level3" data-number="1.2.3">
+<h3 data-number="1.2.3" class="anchored" data-anchor-id="occupancy유무에-따른-수치형-변수-박스플롯"><span class="header-section-number">1.2.3</span> Occupancy유무에 따른 수치형 변수 박스플롯</h3>
+<p>재실(detection)의 경우 예상한 바와 같이 co2가 상대적으로 높다. humidity와 temperature의 경우도 재실이 확인된 경우가 그렇지 않은 경우보다 중위값이 높게 분포 되었다. hour의 박스 플롯을 보면 1시 이후에는 항상 재실 상태임을 확인할 수 있다.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_boxplot</span>(aqara,<span class="at">by =</span> <span class="st">"fp2"</span>,<span class="at">ncol=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_boxplot</span>(aqara,<span class="at">by =</span> <span class="st">"occupancy"</span>,<span class="at">ncol=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="eda_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
-<section id="occupancy-유무에-따른-범주형-변수-박스플롯" class="level3" data-number="1.2.5">
-<h3 data-number="1.2.5" class="anchored" data-anchor-id="occupancy-유무에-따른-범주형-변수-박스플롯"><span class="header-section-number">1.2.5</span> Occupancy 유무에 따른 범주형 변수 박스플롯</h3>
+<section id="fp2-감지-유무에-따른-수치형-변수-박스플롯" class="level3" data-number="1.2.4">
+<h3 data-number="1.2.4" class="anchored" data-anchor-id="fp2-감지-유무에-따른-수치형-변수-박스플롯"><span class="header-section-number">1.2.4</span> fp2 감지 유무에 따른 수치형 변수 박스플롯</h3>
+<p>fp2 감지 유무의 경우 occupancy 감지 유무의 경우와 비슷한 경향을 보이고 있다. temperature의 경우 중위값은 재실감지의 경우가 약간 낮게 나왔으나, 전체적인 분포는 상대적으로 높은 쪽으로 기울어져 있다.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_bar</span>(<span class="at">data=</span>aqara <span class="sc">|&gt;</span>  <span class="fu">select</span>(<span class="sc">-</span>timestamp),<span class="at">by=</span><span class="st">"occupancy"</span>,<span class="at">ncol=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_boxplot</span>(aqara,<span class="at">by =</span> <span class="st">"fp2"</span>,<span class="at">ncol=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="eda_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</section>
+<section id="occupancy-유무에-따른-범주형-변수-바-플롯" class="level3" data-number="1.2.5">
+<h3 data-number="1.2.5" class="anchored" data-anchor-id="occupancy-유무에-따른-범주형-변수-바-플롯"><span class="header-section-number">1.2.5</span> Occupancy 유무에 따른 범주형 변수 바 플롯</h3>
+<p>fp2의 경우 detection 경우보다 non-detection 경우가 훨씬 더 정분류율이 높았다.</p>
+<p>즉, true negative rate &gt; true positive rate</p>
+<p>요일의 경우도 occupancy유무에 따라 다른 패턴을 보였으나, 금/토 데이터 부재로 실제 모델링에서는 사용하지 않을 예정이다.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="ot">&lt;-</span> aqara <span class="sc">|&gt;</span>  </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>weekday<span class="sc">==</span><span class="st">'Sunday'</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_bar</span>(<span class="at">data=</span>aqara <span class="sc">|&gt;</span>  <span class="fu">select</span>(<span class="sc">-</span>timestamp),<span class="at">by=</span><span class="st">"occupancy"</span>,<span class="at">ncol=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="eda_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>본 실험 (위 bar plot에서 참조)에서는 일요일 근무자가 있었던 관계로 일반적인 상황으로 보기에는 어렵기 때문에, 배제하였다.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="ot">&lt;-</span> aqara <span class="sc">|&gt;</span>  </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>weekday<span class="sc">==</span><span class="st">'Sunday'</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="요일별-수치형-변수-박스플롯---현재는-충분한-데이터가-없으므로-의미-없음" class="level3" data-number="1.2.6">
-<h3 data-number="1.2.6" class="anchored" data-anchor-id="요일별-수치형-변수-박스플롯---현재는-충분한-데이터가-없으므로-의미-없음"><span class="header-section-number">1.2.6</span> 요일별 수치형 변수 박스플롯 - 현재는 충분한 데이터가 없으므로 의미 없음</h3>
+<section id="요일별-수치형-변수-박스플롯" class="level3" data-number="1.2.6">
+<h3 data-number="1.2.6" class="anchored" data-anchor-id="요일별-수치형-변수-박스플롯"><span class="header-section-number">1.2.6</span> 요일별 수치형 변수 박스플롯</h3>
+<p>앞에서 설명한 것처럼 금/토 데이터가 부재이고, 실제로 다른 요일의 경우도 각각 1일 데이터만 확보된 상태이므로 모델링에 사용하기에는 부적합하다.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_boxplot</span>(aqara,<span class="at">by =</span> <span class="st">"weekday"</span>,<span class="at">ncol=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_boxplot</span>(aqara,<span class="at">by =</span> <span class="st">"weekday"</span>,<span class="at">ncol=</span><span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="eda_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="상관계수" class="level3" data-number="1.2.7">
 <h3 data-number="1.2.7" class="anchored" data-anchor-id="상관계수"><span class="header-section-number">1.2.7</span> 상관계수</h3>
+<p>motion센서와 door센서간에는 매우 높은 상관 관계를 가지고 있다. features들간의 유의성을 추론할 경우 다중 공선성 문제의 소지가 있으나, 본 실험은 추론보다는 예측을 대상으로 삼고 있으므로, 무시한다.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span> </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(co2,temperature,humidity,door,motion,hour,fp2) <span class="sc">|&gt;</span> </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_correlation</span>(<span class="at">cor_args =</span> <span class="fu">list</span>(<span class="at">use =</span><span class="st">"complete.obs"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(co2,temperature,humidity,door,motion,hour,fp2) <span class="sc">|&gt;</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_correlation</span>(<span class="at">cor_args =</span> <span class="fu">list</span>(<span class="at">use =</span><span class="st">"complete.obs"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="eda_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+<p><img src="eda_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>
 <section id="occupancy-유무에-따른-pairs플롯-및-기타" class="level3" data-number="1.2.8">
 <h3 data-number="1.2.8" class="anchored" data-anchor-id="occupancy-유무에-따른-pairs플롯-및-기타"><span class="header-section-number">1.2.8</span> Occupancy 유무에 따른 pairs플롯 및 기타</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span> </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(co2,temperature,humidity,door,motion,hour,occupancy) <span class="sc">|&gt;</span> </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggpairs</span>(<span class="fu">aes</span>(<span class="at">fill=</span>occupancy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="eda_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span>  </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>occupancy,<span class="at">y=</span>co2)) <span class="sc">+</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(co2,temperature,humidity,door,motion,hour,occupancy) <span class="sc">|&gt;</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggpairs</span>(<span class="fu">aes</span>(<span class="at">fill=</span>occupancy))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="eda_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">%&gt;%</span> </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>weekday,<span class="at">y=</span>co2),<span class="at">col=</span>weekday) <span class="sc">+</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span>  </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>occupancy,<span class="at">y=</span>co2)) <span class="sc">+</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="eda_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span>  </span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(occupancy) <span class="sc">|&gt;</span>  </span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_co2 =</span> <span class="fu">min</span>(co2),</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_co2 =</span> <span class="fu">mean</span>(co2),</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_co2 =</span> <span class="fu">max</span>(co2),</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">min_temperature =</span> <span class="fu">min</span>(temperature)<span class="sc">*</span><span class="dv">100</span>,</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_temperature =</span> <span class="fu">mean</span>(temperature)<span class="sc">*</span><span class="dv">100</span>,</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_temperature =</span> <span class="fu">max</span>(temperature)<span class="sc">*</span><span class="dv">100</span>,</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">min_humidity =</span> <span class="fu">min</span>(humidity)<span class="sc">*</span><span class="dv">100</span>,</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_humidity =</span> <span class="fu">mean</span>(humidity)<span class="sc">*</span><span class="dv">100</span>,</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_humidity =</span> <span class="fu">max</span>(humidity)<span class="sc">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>weekday,<span class="at">y=</span>co2),<span class="at">col=</span>weekday) <span class="sc">+</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="eda_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>aqara <span class="sc">|&gt;</span>  </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(occupancy) <span class="sc">|&gt;</span>  </span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">min_co2 =</span> <span class="fu">min</span>(co2),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_co2 =</span> <span class="fu">mean</span>(co2),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_co2 =</span> <span class="fu">max</span>(co2),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>            <span class="at">min_temperature =</span> <span class="fu">min</span>(temperature)<span class="sc">*</span><span class="dv">100</span>,</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_temperature =</span> <span class="fu">mean</span>(temperature)<span class="sc">*</span><span class="dv">100</span>,</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_temperature =</span> <span class="fu">max</span>(temperature)<span class="sc">*</span><span class="dv">100</span>,</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">min_humidity =</span> <span class="fu">min</span>(humidity)<span class="sc">*</span><span class="dv">100</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">mean_humidity =</span> <span class="fu">mean</span>(humidity)<span class="sc">*</span><span class="dv">100</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">max_humidity =</span> <span class="fu">max</span>(humidity)<span class="sc">*</span><span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 10
   occupancy     min_co2 mean_co2 max_co2 min_temperature mean_temperature
@@ -668,7 +700,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="eda-데이터-저장" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="eda-데이터-저장"><span class="header-section-number">1.3</span> EDA 데이터 저장</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(aqara,<span class="st">"eda.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(aqara,<span class="st">"eda.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
